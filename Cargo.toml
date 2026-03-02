@@ -18,6 +18,96 @@ url = "^2.5"
 tokio = { version = "^1", features = ["macros", "rt-multi-thread"] }
 
 [features]
-default = ["native-tls"]
+default = ["all", "native-tls"]
 native-tls = ["reqwest/native-tls"]
 rustls = ["reqwest/rustls-tls"]
+all = [
+    "apple-pay",
+    "bank-accounts",
+    "booking-custom-attributes",
+    "bookings",
+    "cards",
+    "cash-drawers",
+    "catalog",
+    "channels",
+    "checkout",
+    "customer-custom-attributes",
+    "customer-groups",
+    "customer-segments",
+    "customers",
+    "devices",
+    "disputes",
+    "employees",
+    "events",
+    "gift-card-activities",
+    "gift-cards",
+    "inventory",
+    "invoices",
+    "labor",
+    "location-custom-attributes",
+    "locations",
+    "loyalty",
+    "merchant-custom-attributes",
+    "merchants",
+    "mobile-authorization",
+    "oauth",
+    "order-custom-attributes",
+    "orders",
+    "payments",
+    "payouts",
+    "refunds",
+    "sites",
+    "snippets",
+    "subscriptions",
+    "team",
+    "terminal",
+    "transactions",
+    "transfer-order",
+    "v1-transactions",
+    "vendors",
+    "webhook-subscriptions",
+]
+apple-pay = []
+bank-accounts = []
+booking-custom-attributes = []
+bookings = []
+cards = []
+cash-drawers = []
+catalog = []
+channels = []
+checkout = []
+customer-custom-attributes = []
+customer-groups = []
+customer-segments = []
+customers = []
+devices = []
+disputes = []
+employees = []
+events = []
+gift-card-activities = []
+gift-cards = []
+inventory = []
+invoices = []
+labor = []
+location-custom-attributes = []
+locations = []
+loyalty = []
+merchant-custom-attributes = []
+merchants = []
+mobile-authorization = []
+oauth = []
+order-custom-attributes = []
+orders = []
+payments = []
+payouts = []
+refunds = []
+sites = []
+snippets = []
+subscriptions = []
+team = []
+terminal = []
+transactions = []
+transfer-order = []
+v1-transactions = []
+vendors = []
+webhook-subscriptions = []
