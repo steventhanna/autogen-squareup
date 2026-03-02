@@ -1,11 +1,11 @@
-//! # square-api
+//! # autogen-squareup
 //!
 //! Auto-generated, strongly-typed Rust client for the [Square API](https://developer.squareup.com/reference/square).
 //!
 //! ## Quick Start
 //!
 //! ```no_run
-//! use square_api::SquareClient;
+//! use autogen_squareup::SquareClient;
 //!
 //! #[tokio::main]
 //! async fn main() {
@@ -20,7 +20,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! square-api = { version = "0.1", default-features = false, features = ["payments", "native-tls"] }
+//! autogen-squareup = { version = "0.1", default-features = false, features = ["payments", "native-tls"] }
 //! ```
 
 #![allow(unused_imports)]

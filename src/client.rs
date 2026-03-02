@@ -39,7 +39,7 @@ impl SquareClient {
         let mut configuration = Configuration::new();
         configuration.base_path = env.base_url().to_string();
         configuration.oauth_access_token = Some(access_token.to_string());
-        configuration.user_agent = Some(format!("square-api-rust/{}", env!("CARGO_PKG_VERSION")));
+        configuration.user_agent = Some(format!("autogen-squareup/{}", env!("CARGO_PKG_VERSION")));
         Self { configuration }
     }
 

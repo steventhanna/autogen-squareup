@@ -1,4 +1,4 @@
-# square-api
+# autogen-squareup
 
 Auto-generated, strongly-typed Rust client for the [Square API](https://developer.squareup.com/reference/square).
 
@@ -8,7 +8,7 @@ Generated from the [official Square OpenAPI spec](https://github.com/square/conn
 
 ```toml
 [dependencies]
-square-api = "0.1"
+autogen-squareup = "0.1"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
@@ -16,14 +16,14 @@ To use only specific API groups (reduces compile time):
 
 ```toml
 [dependencies]
-square-api = { version = "0.1", default-features = false, features = ["payments", "customers", "native-tls"] }
+autogen-squareup = { version = "0.1", default-features = false, features = ["payments", "customers", "native-tls"] }
 ```
 
 ## Quick Start
 
 ```rust
-use square_api::SquareClient;
-use square_api::apis::payments_api;
+use autogen_squareup::SquareClient;
+use autogen_squareup::apis::payments_api;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -43,7 +43,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ## Environments
 
 ```rust
-use square_api::SquareClient;
+use autogen_squareup::SquareClient;
 
 // Production (default)
 let client = SquareClient::new("sq0atp-...");
@@ -52,7 +52,7 @@ let client = SquareClient::new("sq0atp-...");
 let client = SquareClient::sandbox("sandbox-sq0atp-...");
 
 // Explicit environment
-use square_api::Environment;
+use autogen_squareup::Environment;
 let client = SquareClient::with_env("sq0atp-...", Environment::Production);
 ```
 
@@ -61,9 +61,9 @@ let client = SquareClient::with_env("sq0atp-...", Environment::Production);
 ### Create a Payment
 
 ```rust
-use square_api::SquareClient;
-use square_api::apis::payments_api;
-use square_api::models::{CreatePaymentRequest, Money};
+use autogen_squareup::SquareClient;
+use autogen_squareup::apis::payments_api;
+use autogen_squareup::models::{CreatePaymentRequest, Money};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -74,7 +74,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         idempotency_key: Some(Some("unique-key-123".to_string())),
         amount_money: Some(Box::new(Money {
             amount: Some(Some(1000)), // $10.00
-            currency: Some(Some(square_api::models::Currency::Usd)),
+            currency: Some(Some(autogen_squareup::models::Currency::Usd)),
         })),
         ..Default::default()
     };
@@ -88,8 +88,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### List Locations
 
 ```rust
-use square_api::SquareClient;
-use square_api::apis::locations_api;
+use autogen_squareup::SquareClient;
+use autogen_squareup::apis::locations_api;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -109,8 +109,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 ### List Customers
 
 ```rust
-use square_api::SquareClient;
-use square_api::apis::customers_api;
+use autogen_squareup::SquareClient;
+use autogen_squareup::apis::customers_api;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -229,7 +229,7 @@ This fetches the latest spec, runs the generator, applies post-processing fixes 
 
 The existing [`squareup`](https://crates.io/crates/squareup) crate is hand-written. This crate is auto-generated from the spec, which avoids several issues:
 
-| Issue | `squareup` | `square-api` |
+| Issue | `squareup` | `autogen-squareup` |
 |-------|-----------|-------------|
 | `due_date` type | `DateTime` (wrong — spec says string) | `String` |
 | Nullable fields | Sends `null` (no `skip_serializing_if`) | Omits field when `None` |

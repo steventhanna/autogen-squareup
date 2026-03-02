@@ -1,4 +1,4 @@
-use square_api::{SquareClient, Environment};
+use autogen_squareup::{SquareClient, Environment};
 
 #[test]
 fn test_production_client_has_correct_base_path() {
