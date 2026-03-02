@@ -13,7 +13,7 @@ openapi-generator generate \
   -g rust \
   --library reqwest \
   --skip-validate-spec \
-  --additional-properties=packageName=autogen-squareup,packageVersion=0.1.0,supportAsync=true \
+  --additional-properties=packageName=autogen-squareup,supportAsync=true \
   -o . \
   2>&1 | tail -5
 
