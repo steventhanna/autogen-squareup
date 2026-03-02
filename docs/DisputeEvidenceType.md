@@ -1,0 +1,26 @@
+# DisputeEvidenceType
+
+## Enum Variants
+
+| Name | Value |
+|---- | -----|
+| GenericEvidence | GENERIC_EVIDENCE |
+| OnlineOrAppAccessLog | ONLINE_OR_APP_ACCESS_LOG |
+| AuthorizationDocumentation | AUTHORIZATION_DOCUMENTATION |
+| CancellationOrRefundDocumentation | CANCELLATION_OR_REFUND_DOCUMENTATION |
+| CardholderCommunication | CARDHOLDER_COMMUNICATION |
+| CardholderInformation | CARDHOLDER_INFORMATION |
+| PurchaseAcknowledgement | PURCHASE_ACKNOWLEDGEMENT |
+| DuplicateChargeDocumentation | DUPLICATE_CHARGE_DOCUMENTATION |
+| ProductOrServiceDescription | PRODUCT_OR_SERVICE_DESCRIPTION |
+| Receipt | RECEIPT |
+| ServiceReceivedDocumentation | SERVICE_RECEIVED_DOCUMENTATION |
+| ProofOfDeliveryDocumentation | PROOF_OF_DELIVERY_DOCUMENTATION |
+| RelatedTransactionDocumentation | RELATED_TRANSACTION_DOCUMENTATION |
+| RebuttalExplanation | REBUTTAL_EXPLANATION |
+| TrackingNumber | TRACKING_NUMBER |
+
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

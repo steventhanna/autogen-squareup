@@ -1,0 +1,13 @@
+# LoyaltyProgramCreatedEventData
+
+## Properties
+
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**r#type** | Option<**String**> | The type of object affected by the event. For this event, the value is `loyalty_program`. | [optional]
+**id** | Option<**String**> | The ID of the created loyalty program. | [optional]
+**object** | Option<[**models::LoyaltyProgramCreatedEventObject**](LoyaltyProgramCreatedEventObject.md)> |  | [optional]
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+
