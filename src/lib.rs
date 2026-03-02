@@ -1,3 +1,28 @@
+//! # square-api
+//!
+//! Auto-generated, strongly-typed Rust client for the [Square API](https://developer.squareup.com/reference/square).
+//!
+//! ## Quick Start
+//!
+//! ```no_run
+//! use square_api::SquareClient;
+//!
+//! #[tokio::main]
+//! async fn main() {
+//!     let client = SquareClient::new("your-access-token");
+//!     // Use client.config() with generated API functions
+//! }
+//! ```
+//!
+//! ## Feature Flags
+//!
+//! By default all API groups are enabled. To reduce compile time, select only what you need:
+//!
+//! ```toml
+//! [dependencies]
+//! square-api = { version = "0.1", default-features = false, features = ["payments", "native-tls"] }
+//! ```
+
 #![allow(unused_imports)]
 #![allow(clippy::too_many_arguments)]
 
