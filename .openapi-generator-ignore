@@ -1,0 +1,8 @@
+# Protect our hand-maintained files from being overwritten on re-generation
+Cargo.toml
+src/lib.rs
+src/client.rs
+README.md
+.gitignore
+.travis.yml
+git_push.sh
