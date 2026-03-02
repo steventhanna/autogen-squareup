@@ -227,7 +227,7 @@ pub async fn delete_invoice(configuration: &configuration::Configuration, invoic
     let mut req_builder = configuration.client.request(reqwest::Method::DELETE, &uri_str);
 
     if let Some(ref param_value) = p_version {
-        req_builder = req_builder.query(&[("version", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("version", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
@@ -354,10 +354,10 @@ pub async fn list_invoices(configuration: &configuration::Configuration, locatio
 
     req_builder = req_builder.query(&[("location_id", &p_location_id.to_string())]);
     if let Some(ref param_value) = p_cursor {
-        req_builder = req_builder.query(&[("cursor", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("cursor", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref param_value) = p_limit {
-        req_builder = req_builder.query(&[("limit", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("limit", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());

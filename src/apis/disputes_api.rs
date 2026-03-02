@@ -260,7 +260,7 @@ pub async fn list_dispute_evidence(configuration: &configuration::Configuration,
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
     if let Some(ref param_value) = p_cursor {
-        req_builder = req_builder.query(&[("cursor", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("cursor", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
@@ -305,13 +305,13 @@ pub async fn list_disputes(configuration: &configuration::Configuration, cursor:
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
     if let Some(ref param_value) = p_cursor {
-        req_builder = req_builder.query(&[("cursor", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("cursor", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref param_value) = p_states {
-        req_builder = req_builder.query(&[("states", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("states", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref param_value) = p_location_id {
-        req_builder = req_builder.query(&[("location_id", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("location_id", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());

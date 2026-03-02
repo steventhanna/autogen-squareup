@@ -313,10 +313,9 @@ pub async fn search_vendors(configuration: &configuration::Configuration, search
 /// Updates an existing [Vendor](entity:Vendor) object as a supplier to a seller.
 pub async fn update_vendor(configuration: &configuration::Configuration, vendor_id: &str, update_vendor_request: models::UpdateVendorRequest) -> Result<models::UpdateVendorResponse, Error<UpdateVendorError>> {
     // add a prefix to parameters to efficiently prevent name collisions
-    let p_vendor_id = vendor_id;
     let p_update_vendor_request = update_vendor_request;
 
-    let uri_str = format!("{}/v2/vendors/{vendor_id}", configuration.base_path, vendor_id=crate::apis::urlencode(p_vendor_id));
+    let uri_str = format!("{}/v2/vendors/{vendor_id}", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {

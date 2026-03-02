@@ -373,13 +373,13 @@ pub async fn list_catalog(configuration: &configuration::Configuration, cursor: 
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
     if let Some(ref param_value) = p_cursor {
-        req_builder = req_builder.query(&[("cursor", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("cursor", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref param_value) = p_types {
-        req_builder = req_builder.query(&[("types", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("types", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref param_value) = p_catalog_version {
-        req_builder = req_builder.query(&[("catalog_version", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("catalog_version", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
@@ -425,13 +425,13 @@ pub async fn retrieve_catalog_object(configuration: &configuration::Configuratio
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
 
     if let Some(ref param_value) = p_include_related_objects {
-        req_builder = req_builder.query(&[("include_related_objects", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("include_related_objects", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref param_value) = p_catalog_version {
-        req_builder = req_builder.query(&[("catalog_version", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("catalog_version", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref param_value) = p_include_category_path_to_root {
-        req_builder = req_builder.query(&[("include_category_path_to_root", &param_value.to_string())]);
+        req_builder = req_builder.query(&[("include_category_path_to_root", &serde_json::to_string(&param_value).unwrap_or_default())]);
     }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());

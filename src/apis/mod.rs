@@ -111,8 +111,6 @@ impl From<&str> for ContentType {
     }
 }
 
-pub mod configuration;
-
 #[cfg(feature = "apple-pay")]
 pub mod apple_pay_api;
 #[cfg(feature = "bank-accounts")]
@@ -201,3 +199,5 @@ pub mod v1_transactions_api;
 pub mod vendors_api;
 #[cfg(feature = "webhook-subscriptions")]
 pub mod webhook_subscriptions_api;
+
+pub mod configuration;

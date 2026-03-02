@@ -6,6 +6,7 @@ license = "MIT"
 description = "Auto-generated, strongly-typed Rust client for the Square API"
 keywords = ["square", "payments", "api", "sdk"]
 categories = ["api-bindings"]
+repository = "https://github.com/steventhanna/autogen-squareup"
 
 [dependencies]
 reqwest = { version = "^0.12", default-features = false, features = ["json", "multipart"] }
