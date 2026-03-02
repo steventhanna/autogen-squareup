@@ -1,6 +1,15 @@
 #!/bin/bash
 set -euo pipefail
 
+# Portable in-place sed (macOS uses -i '', Linux uses -i)
+sedi() {
+  if [[ "$OSTYPE" == "darwin"* ]]; then
+    sed -i '' "$@"
+  else
+    sed -i "$@"
+  fi
+}
+
 SPEC_URL="https://raw.githubusercontent.com/square/connect-api-specification/master/api.json"
 
 echo "==> Fetching Square OpenAPI spec..."
@@ -24,21 +33,21 @@ echo "==> Applying post-generation fixes..."
 
 # Fix 1: models::models:: double prefix in multipart API files (generator bug)
 echo "    Fixing models::models:: double prefix..."
-sed -i '' 's/models::models::/models::/g' \
+sedi 's/models::models::/models::/g' \
   src/apis/catalog_api.rs \
   src/apis/disputes_api.rs \
   src/apis/invoices_api.rs
 
 # Fix 2: param_value.to_string() type inference failure in multipart form code
 echo "    Fixing multipart to_string() type inference..."
-sed -i '' 's/param_value\.to_string()/serde_json::to_string(\&param_value).unwrap_or_default()/g' \
+sedi 's/param_value\.to_string()/serde_json::to_string(\&param_value).unwrap_or_default()/g' \
   src/apis/catalog_api.rs \
   src/apis/disputes_api.rs \
   src/apis/invoices_api.rs
 
 # Fix 3: Missing vendor_id path parameter in update_vendor()
 echo "    Fixing missing vendor_id parameter in update_vendor..."
-sed -i '' 's/pub async fn update_vendor(configuration: \&configuration::Configuration, update_vendor_request: models::UpdateVendorRequest)/pub async fn update_vendor(configuration: \&configuration::Configuration, vendor_id: \&str, update_vendor_request: models::UpdateVendorRequest)/' \
+sedi 's/pub async fn update_vendor(configuration: \&configuration::Configuration, update_vendor_request: models::UpdateVendorRequest)/pub async fn update_vendor(configuration: \&configuration::Configuration, vendor_id: \&str, update_vendor_request: models::UpdateVendorRequest)/' \
   src/apis/vendors_api.rs
 
 # Fix 4: Missing CatalogModifierToggleOverrideType (spec references but never defines it)
@@ -89,7 +98,7 @@ TYPEEOF
 echo "    Re-applying feature gates to apis/mod.rs..."
 apply_gate() {
   local mod_name="$1" feature="$2"
-  sed -i '' "s/^pub mod ${mod_name};/#[cfg(feature = \"${feature}\")]\\"$'\n'"pub mod ${mod_name};/" src/apis/mod.rs
+  sedi "s/^pub mod ${mod_name};/#[cfg(feature = \"${feature}\")]\\"$'\n'"pub mod ${mod_name};/" src/apis/mod.rs
 }
 
 apply_gate apple_pay_api apple-pay
