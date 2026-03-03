@@ -17,6 +17,7 @@ url = "^2.5"
 
 [dev-dependencies]
 tokio = { version = "^1", features = ["macros", "rt-multi-thread"] }
+uuid = { version = "^1", features = ["v4"] }
 
 [features]
 default = ["all", "native-tls"]
@@ -112,3 +113,4 @@ transfer-order = []
 v1-transactions = []
 vendors = []
 webhook-subscriptions = []
+integration = []

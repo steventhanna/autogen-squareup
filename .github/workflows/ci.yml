@@ -33,3 +33,28 @@ jobs:
 
       - name: cargo test
         run: cargo test --all-features
+
+  integration:
+    runs-on: ubuntu-latest
+    needs: check
+    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name == github.repository
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Integration tests
+        run: cargo test --all-features --features integration -- --test-threads=1
+        env:
+          SQUARE_SANDBOX_TOKEN: ${{ secrets.SQUARE_SANDBOX_TOKEN }}
