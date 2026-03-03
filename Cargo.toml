@@ -1,6 +1,6 @@
 [package]
 name = "autogen-squareup"
-version = "0.20251016.0"
+version = "0.20251016.1"
 edition = "2021"
 license = "MIT"
 description = "Auto-generated, strongly-typed Rust client for the Square API"
