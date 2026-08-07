@@ -20,6 +20,9 @@ pub struct OrderLineItemPricingBlocklists {
     /// A list of taxes blocked from applying to the line item. Taxes can be blocked by the `tax_uid` (for ad hoc taxes) or the `tax_catalog_object_id` (for catalog taxes).
     #[serde(rename = "blocked_taxes", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub blocked_taxes: Option<Option<Vec<models::OrderLineItemPricingBlocklistsBlockedTax>>>,
+    /// A list of service charges blocked from applying to the line item. Service charges can be blocked by the `service_charge_uid` (for ad hoc service charges) or the `service_charge_catalog_object_id` (for catalog service charges).
+    #[serde(rename = "blocked_service_charges", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub blocked_service_charges: Option<Option<Vec<models::OrderLineItemPricingBlocklistsBlockedServiceCharge>>>,
 }
 
 impl OrderLineItemPricingBlocklists {
@@ -28,6 +31,7 @@ impl OrderLineItemPricingBlocklists {
         OrderLineItemPricingBlocklists {
             blocked_discounts: None,
             blocked_taxes: None,
+            blocked_service_charges: None,
         }
     }
 }

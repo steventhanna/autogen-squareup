@@ -19,18 +19,18 @@ pub struct FulfillmentPickupDetails {
     /// The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates) indicating when this fulfillment expires if it is not marked in progress. The timestamp must be in RFC 3339 format (for example, \"2016-09-04T23:59:33.123Z\"). The expiration time can only be set up to 7 days in the future. If `expires_at` is not set, any new payments attached to the order are automatically completed.
     #[serde(rename = "expires_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub expires_at: Option<Option<String>>,
-    /// The duration of time after which an in progress pickup fulfillment is automatically moved to the `COMPLETED` state. The duration must be in RFC 3339 format (for example, \"P1W3D\").  If not set, this pickup fulfillment remains in progress until it is canceled or completed.
+    /// The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates) after which an in-progress pickup fulfillment is automatically moved to the `COMPLETED` state. The duration must be in RFC 3339 format (for example, \"PT4H\" for 4 hours).  If not set, this pickup fulfillment remains in progress until it is canceled or completed.
     #[serde(rename = "auto_complete_duration", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub auto_complete_duration: Option<Option<String>>,
     #[serde(rename = "schedule_type", skip_serializing_if = "Option::is_none")]
     pub schedule_type: Option<models::FulfillmentPickupDetailsScheduleType>,
-    /// The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates) that represents the start of the pickup window. Must be in RFC 3339 timestamp format, e.g., \"2016-09-04T23:59:33.123Z\".  For fulfillments with the schedule type `ASAP`, this is automatically set to the current time plus the expected duration to prepare the fulfillment.
+    /// The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates) that represents the start of the pickup window. Must be in RFC 3339 timestamp format, e.g., \"2016-09-04T23:59:33.123Z\".  For fulfillments with the schedule type `ASAP`, this is automatically set to the current time plus `prep_time_duration`, if available.
     #[serde(rename = "pickup_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub pickup_at: Option<Option<String>>,
-    /// The window of time in which the order should be picked up after the `pickup_at` timestamp. Must be in RFC 3339 duration format, e.g., \"P1W3D\". Can be used as an informational guideline for merchants.
+    /// The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates) in which the order should be picked up after the `pickup_at` timestamp. The duration must be in RFC 3339 format (for example, \"PT30M\" for 30 minutes). Don't confuse \"M\" for months with \"M\" for minutes. \"P5M\" means 5 months, while \"PT5M\" means 5 minutes.  Can be used as an informational guideline for merchants.
     #[serde(rename = "pickup_window_duration", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub pickup_window_duration: Option<Option<String>>,
-    /// The duration of time it takes to prepare this fulfillment. The duration must be in RFC 3339 format (for example, \"P1W3D\").
+    /// The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates) needed to prepare this fulfillment. The duration must be in RFC 3339 format (for example, \"PT30M\" for 30 minutes). Don't confuse \"M\" for months with \"M\" for minutes. \"P5M\" means 5 months, while \"PT5M\" means 5 minutes.
     #[serde(rename = "prep_time_duration", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub prep_time_duration: Option<Option<String>>,
     /// A note to provide additional instructions about the pickup fulfillment displayed in the Square Point of Sale application and set by the API.

@@ -31,6 +31,9 @@ pub struct CatalogModifier {
     /// Location-specific price overrides.
     #[serde(rename = "location_overrides", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub location_overrides: Option<Option<Vec<models::ModifierLocationOverrides>>>,
+    /// (Optional) Name that the restaurant wants to display to their kitchen workers instead of the customer-facing name. e.g., customer name might be \"Double Baconize\" and the kitchen name is \"Add 2x bacon\"
+    #[serde(rename = "kitchen_name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub kitchen_name: Option<Option<String>>,
     /// The ID of the image associated with this `CatalogModifier` instance. Currently this image is not displayed by Square, but is free to be displayed in 3rd party applications.
     #[serde(rename = "image_id", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub image_id: Option<Option<String>>,
@@ -49,6 +52,7 @@ impl CatalogModifier {
             ordinal: None,
             modifier_list_id: None,
             location_overrides: None,
+            kitchen_name: None,
             image_id: None,
             hidden_online: None,
         }

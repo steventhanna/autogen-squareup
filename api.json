@@ -146,7 +146,7 @@
             "name": "Square-Version",
             "description": "Square Connect API versions",
             "schema": {
-              "default": "2025-10-16"
+              "default": "2026-07-15"
             }
           }
         ],
@@ -200,6 +200,7 @@
               "PAYMENTS_WRITE_IN_PERSON": "__HTTP Method__: `POST`, `PUT`, `DELETE`\n\nGrants write access to payments and refunds information. For example, to\nprocess in-person payments.",
               "PAYMENTS_WRITE_SHARED_ONFILE": "__HTTP Method__: `POST`, `PUT`, `DELETE`\n\nAllows the developer to process payments on behalf of a seller using a shared on file payment method.",
               "PAYOUTS_READ": "__HTTP Method__: `GET`\n\nGrants read access to payouts and payout entries information. For example,\nto call the Connect v2 `ListPayouts` endpoint.",
+              "PAYOUTS_WRITE": "__HTTP Method__: `POST`\n\nGrants access to schedule a payout.",
               "PERMISSION_SETS_READ": "__HTTP Method__: `GET`\n\nGrants read access to Permission Sets. For example, to\ncall the `ListPermissionSets` and `RetrievePermissionSet` endpoints.",
               "PERMISSION_SETS_WRITE": "__HTTP Method__: `PUT`\n\nGrants write access to Permission Sets.",
               "RESERVATIONS_READ": "__HTTP Method__: `GET`\n\nGrants read access to reservation information, for example, when calling the\n`RetrieveReservation` endpoint.",
@@ -1207,6 +1208,12 @@
             "description": "Read only. Name of actual financial institution. \nFor example \"Bank of America\".",
             "maxLength": 100,
             "nullable": true
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "The ID of the customer who owns the bank account",
+            "readOnly": true,
+            "x-release-status": "BETA"
           }
         }
       },
@@ -2078,6 +2085,21 @@
             "minimum": 1,
             "maximum": 1000,
             "nullable": true
+          },
+          "sort": {
+            "$ref": "#/components/schemas/BatchRetrieveInventoryChangesSort",
+            "description": "Specification of how returned inventory changes should be ordered.\n\nCurrently, inventory changes can only be ordered by the occurred_at field.\nThe default sort order for occurred_at is ASC (changes are returned oldest-first by default).",
+            "x-release-status": "BETA",
+            "nullable": true
+          },
+          "reason_ids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryAdjustmentReasonId"
+            },
+            "description": "The filter to return `ADJUSTMENT` query results by inventory\nadjustment reason. This filter is only applied when set. The request cannot\ninclude both `reason_ids` and `states`.",
+            "x-release-status": "BETA",
+            "nullable": true
           }
         },
         "example": {
@@ -2153,6 +2175,35 @@
           ],
           "errors": []
         }
+      },
+      "BatchRetrieveInventoryChangesSort": {
+        "type": "object",
+        "x-release-status": "BETA",
+        "properties": {
+          "field": {
+            "$ref": "#/components/schemas/BatchRetrieveInventoryChangesSortField",
+            "description": "The field to sort inventory changes by.\nSee [Field](#type-field) for possible values",
+            "nullable": true
+          },
+          "order": {
+            "$ref": "#/components/schemas/SortOrder",
+            "description": "The order to sort inventory changes by.\nSee [SortOrder](#type-sortorder) for possible values",
+            "nullable": true
+          }
+        }
+      },
+      "BatchRetrieveInventoryChangesSortField": {
+        "type": "string",
+        "enum": [
+          "OCCURRED_AT"
+        ],
+        "x-enum-elements": [
+          {
+            "name": "OCCURRED_AT",
+            "description": ""
+          }
+        ],
+        "x-release-status": "BETA"
       },
       "BatchRetrieveInventoryCountsRequest": {
         "type": "object",
@@ -4746,7 +4797,6 @@
             "type": "string",
             "description": "The key of the custom attribute to delete.  This key must match the key \nof an existing custom attribute definition.",
             "minLength": 1,
-            "pattern": "^([a-zA-Z0-9_-]+:)?[a-zA-Z0-9_-]{1,60}$",
             "readOnly": true
           },
           "order_id": {
@@ -6787,6 +6837,14 @@
             "$ref": "#/components/schemas/ClearpayDetails",
             "description": "Details about a Clearpay payment. These details are only populated if the `brand` is\n`CLEARPAY`.",
             "nullable": true
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Information about errors encountered during the payment.",
+            "readOnly": true
           }
         }
       },
@@ -7757,6 +7815,16 @@
             "maxLength": 6,
             "readOnly": true
           },
+          "created_at": {
+            "type": "string",
+            "description": "Timestamp for when the card object was created on Square’s servers. In RFC 3339 format, e.g., \"2016-09-04T23:59:33.123Z\".",
+            "readOnly": true
+          },
+          "disabled_at": {
+            "type": "string",
+            "description": "Timestamp for when the card object was disabled on Square’s servers. In RFC 3339 format, e.g., \"2016-09-04T23:59:33.123Z\".",
+            "readOnly": true
+          },
           "version": {
             "type": "integer",
             "description": "Current version number of the card. Increments with each card update. Requests to update an\nexisting Card object will be rejected unless the version in the request matches the current\nversion for the Card.",
@@ -8468,6 +8536,18 @@
             },
             "description": "Information about errors encountered during the request.",
             "readOnly": true
+          },
+          "applied_card_surcharge_details": {
+            "$ref": "#/components/schemas/CardSurchargeDetails",
+            "description": "Additional information about a card_surcharge on the payment.",
+            "readOnly": true
+          },
+          "wallet_type": {
+            "type": "string",
+            "description": "The type of digital wallet used for this card payment, if applicable.\nCurrently only populated for in-person Apple Pay payments. Detection has no false\npositives but may have false negatives (some Apple Pay payments may not be detected).\n\nFor payments with `source_type` of `WALLET`, see `DigitalWalletDetails` instead.\n\nValues: `APPLE_PAY`",
+            "maxLength": 50,
+            "readOnly": true,
+            "x-release-status": "BETA"
           }
         }
       },
@@ -8516,6 +8596,18 @@
         ],
         "description": "Indicates a card's prepaid type, such as `NOT_PREPAID` or `PREPAID`.",
         "x-release-status": "PUBLIC"
+      },
+      "CardSurchargeDetails": {
+        "type": "object",
+        "description": "Details related to an attempt to apply a card surcharge to this payment.  When surcharge\neligibility is not known in advance, such as when the card type (debit or credit) is required\nto make the eligibility determination, proposed_card_surcharge_money and\nproposed_additional_amount_money will match the values in the request, while card_surcharge_money\nand additional_amount_money are present only when the payment has a surcharge applied.",
+        "x-release-status": "PUBLIC",
+        "properties": {
+          "card_surcharge_money": {
+            "$ref": "#/components/schemas/Money",
+            "description": "A specific surcharge levied by the merchant, if a card payment is used, instead of cash or\nsome other payment type. Should only include the base surcharge amount. Any additional fees related\nto the surcharge (e.g. taxes on the surcharge) should only be included in the additional_amount_money.\nThis amount is specified in the smallest denomination of the applicable currency (for example,\nUS dollar amounts are specified in cents). For more information, see\n[Working with Monetary Amounts](https://developer.squareup.com/docs/build-basics/working-with-monetary-amounts).\nThe currency code must match the currency associated with the business that is accepting the\npayment.",
+            "nullable": true
+          }
+        }
       },
       "CardType": {
         "type": "string",
@@ -9054,7 +9146,7 @@
           },
           "parent_category": {
             "$ref": "#/components/schemas/CatalogObjectCategory",
-            "description": "The ID of the parent category of this category instance.",
+            "description": "The parent category of this category instance. This includes the parent category ID and an ordinal\nvalue that determines the category's relative position among sibling categories with the same parent.",
             "nullable": true
           },
           "is_top_level": {
@@ -9723,6 +9815,12 @@
             "x-release-status": "DEPRECATED",
             "nullable": true
           },
+          "buyer_facing_name": {
+            "type": "string",
+            "description": "The override to a product name to display to users",
+            "maxLength": 512,
+            "nullable": true
+          },
           "tax_ids": {
             "type": "array",
             "items": {
@@ -9800,7 +9898,7 @@
             "items": {
               "$ref": "#/components/schemas/CatalogObjectCategory"
             },
-            "description": "The list of categories.",
+            "description": "The list of categories to which this item belongs. Each entry includes the category ID and an ordinal\nvalue that determines the item's relative position within that category.",
             "nullable": true
           },
           "description_html": {
@@ -9814,6 +9912,12 @@
             "description": "A server-generated plaintext version of the `description_html` field, without formatting tags.",
             "maxLength": 65535,
             "readOnly": true
+          },
+          "kitchen_name": {
+            "type": "string",
+            "description": "(Optional) Name that the restaurant wants to display to their kitchen workers\ninstead of the customer-facing name.\ne.g., customer name might be \"Big John's Mega Burger\" and the\nkitchen name is \"12oz beef burger\"",
+            "x-release-status": "BETA",
+            "nullable": true
           },
           "channels": {
             "type": "array",
@@ -10115,7 +10219,7 @@
           },
           "ordinal": {
             "type": "integer",
-            "description": "The position of this `CatalogItemModifierListInfo` object within the `modifier_list_info` list applied \nto a `CatalogItem` instance.",
+            "description": "The position of this `CatalogItemModifierListInfo` object within the `modifier_list_info` list applied\nto a `CatalogItem` instance.",
             "x-release-status": "BETA",
             "nullable": true
           },
@@ -10339,17 +10443,17 @@
           },
           "track_inventory": {
             "type": "boolean",
-            "description": "If `true`, inventory tracking is active for the variation.",
+            "description": "If `true`, inventory tracking is active for the variation at all locations by default.\nThis value can be overridden for specific locations using `ItemVariationLocationOverrides.track_inventory`.\nIf unset at both levels, inventory tracking is disabled.",
             "nullable": true
           },
           "inventory_alert_type": {
             "$ref": "#/components/schemas/InventoryAlertType",
-            "description": "Indicates whether the item variation displays an alert when its inventory quantity is less than or equal\nto its `inventory_alert_threshold`.\nSee [InventoryAlertType](#type-inventoryalerttype) for possible values",
+            "description": "Indicates whether the item variation displays an alert when its inventory quantity is less than or equal\nto its `inventory_alert_threshold`.\n\nDeprecated because this field has never been global.\nSee [InventoryAlertType](#type-inventoryalerttype) for possible values",
             "nullable": true
           },
           "inventory_alert_threshold": {
             "type": "integer",
-            "description": "If the inventory quantity for the variation is less than or equal to this value and `inventory_alert_type`\nis `LOW_QUANTITY`, the variation displays an alert in the merchant dashboard.\n\nThis value is always an integer.",
+            "description": "If the inventory quantity for the variation is less than or equal to this value and `inventory_alert_type`\nis `LOW_QUANTITY`, the variation displays an alert in the merchant dashboard. This value is always an integer.\n\nDeprecated because this field has never been global.",
             "format": "int64",
             "nullable": true
           },
@@ -10418,6 +10522,43 @@
             "description": "The unit conversion rule, as prescribed by the [CatalogStockConversion](entity:CatalogStockConversion) type,\nthat describes how this non-stockable (i.e., sellable/receivable) item variation is converted\nto/from the stockable item variation sharing the same parent item. With the stock conversion,\nyou can accurately track inventory when an item variation is sold in one unit, but stocked in\nanother unit.",
             "x-release-status": "BETA",
             "nullable": true
+          },
+          "kitchen_name": {
+            "type": "string",
+            "description": "(Optional) Name that the restaurant wants to display to their kitchen workers\ninstead of the customer-facing name.\ne.g., customer name might be \"Mega-Jumbo Triplesized\" and the\nkitchen name is \"Large container\"",
+            "x-release-status": "BETA",
+            "nullable": true
+          },
+          "vendor_information": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CatalogItemVariationVendorInformation"
+            },
+            "description": "Details of the vendor this product is purchased from.\nThis field can be set only if the seller has an active subscription\nto either Square for Retail Premium or Square for Restaurants Premium.",
+            "x-release-status": "BETA",
+            "nullable": true
+          }
+        }
+      },
+      "CatalogItemVariationVendorInformation": {
+        "type": "object",
+        "description": "Information about the vendor of an item variation.",
+        "x-release-status": "BETA",
+        "properties": {
+          "vendor_id": {
+            "type": "string",
+            "description": "ID of the [Vendor](entity:Vendor) linked to a default cost of this product.\nWhen the product is added to a purchase order, the default cost is pre-filled.\nThis field is not validated. Clients should gracefully handle cases where the vendor_id\ndoes not match any existing vendor.",
+            "nullable": true
+          },
+          "vendor_code": {
+            "type": "string",
+            "description": "Unique identifier of this product in the specified vendor's' inventory system.\nWhen the product is added to a purchase order, the vendor code is pre-filled based\non the selected vendor.",
+            "nullable": true
+          },
+          "unit_cost_money": {
+            "$ref": "#/components/schemas/Money",
+            "description": "The unit cost of the linked product, when purchased from the linked vendor.",
+            "nullable": true
           }
         }
       },
@@ -10478,6 +10619,12 @@
             "description": "Location-specific price overrides.",
             "nullable": true
           },
+          "kitchen_name": {
+            "type": "string",
+            "description": "(Optional) Name that the restaurant wants to display to their kitchen workers\ninstead of the customer-facing name.\ne.g., customer name might be \"Double Baconize\" and the\nkitchen name is \"Add 2x bacon\"",
+            "x-release-status": "BETA",
+            "nullable": true
+          },
           "image_id": {
             "type": "string",
             "description": "The ID of the image associated with this `CatalogModifier` instance.\nCurrently this image is not displayed by Square, but is free to be displayed in 3rd party applications.",
@@ -10512,7 +10659,7 @@
         "properties": {
           "name": {
             "type": "string",
-            "description": "The name of the `CatalogModifierList` instance. This is a searchable attribute for use in applicable query filters, and its value length is of \nUnicode code points.",
+            "description": "The name of the `CatalogModifierList` instance. This is a searchable attribute for use in applicable query filters, and its value length is of\nUnicode code points.",
             "maxLength": 255,
             "nullable": true
           },
@@ -10532,7 +10679,7 @@
             "items": {
               "$ref": "#/components/schemas/CatalogObject"
             },
-            "description": "A non-empty list of `CatalogModifier` objects to be included in the `CatalogModifierList`, \nfor non text-based modifiers when the `modifier_type` attribute is `LIST`. Each element of this list \nis a `CatalogObject` instance of the `MODIFIER` type, containing the following attributes:\n```\n{\n\"id\": \"{{catalog_modifier_id}}\",\n\"type\": \"MODIFIER\", \n\"modifier_data\": {{a CatalogModifier instance\u003e}} \n}\n```",
+            "description": "A non-empty list of `CatalogModifier` objects to be included in the `CatalogModifierList`,\nfor non text-based modifiers when the `modifier_type` attribute is `LIST`. Each element of this list\nis a `CatalogObject` instance of the `MODIFIER` type, containing the following attributes:\n```\n{\n\"id\": \"{{catalog_modifier_id}}\",\n\"type\": \"MODIFIER\",\n\"modifier_data\": {{a CatalogModifier instance\u003e}}\n}\n```",
             "nullable": true
           },
           "image_ids": {
@@ -10557,13 +10704,13 @@
           },
           "modifier_type": {
             "$ref": "#/components/schemas/CatalogModifierListModifierType",
-            "description": "The type of the modifier. \n\nWhen this `modifier_type` value is `TEXT`,  the `CatalogModifierList` represents a text-based modifier. \nWhen this `modifier_type` value is `LIST`, the `CatalogModifierList` contains a list of `CatalogModifier` objects.\nSee [CatalogModifierListModifierType](#type-catalogmodifierlistmodifiertype) for possible values",
+            "description": "The type of the modifier.\n\nWhen this `modifier_type` value is `TEXT`,  the `CatalogModifierList` represents a text-based modifier.\nWhen this `modifier_type` value is `LIST`, the `CatalogModifierList` contains a list of `CatalogModifier` objects.\nSee [CatalogModifierListModifierType](#type-catalogmodifierlistmodifiertype) for possible values",
             "x-release-status": "BETA",
             "nullable": true
           },
           "max_length": {
             "type": "integer",
-            "description": "The maximum length, in Unicode points, of the text string of the text-based modifier as represented by \nthis `CatalogModifierList` object with the `modifier_type` set to `TEXT`.",
+            "description": "The maximum length, in Unicode points, of the text string of the text-based modifier as represented by\nthis `CatalogModifierList` object with the `modifier_type` set to `TEXT`.",
             "x-release-status": "BETA",
             "nullable": true
           },
@@ -10575,7 +10722,7 @@
           },
           "internal_name": {
             "type": "string",
-            "description": "A note for internal use by the business.   \n\nFor example, for a text-based modifier applied to a T-shirt item, if the buyer-supplied text of \"Hello, Kitty!\"  \nis to be printed on the T-shirt, this `internal_name` attribute can be \"Use italic face\" as \nan instruction for the business to follow.  \n\nFor non text-based modifiers, this `internal_name` attribute can be \nused to include SKUs, internal codes, or supplemental descriptions for internal use.",
+            "description": "A note for internal use by the business.\n\nFor example, for a text-based modifier applied to a T-shirt item, if the buyer-supplied text of \"Hello, Kitty!\"\nis to be printed on the T-shirt, this `internal_name` attribute can be \"Use italic face\" as\nan instruction for the business to follow.\n\nFor non text-based modifiers, this `internal_name` attribute can be\nused to include SKUs, internal codes, or supplemental descriptions for internal use.",
             "maxLength": 512,
             "x-release-status": "BETA",
             "nullable": true
@@ -10718,6 +10865,30 @@
           }
         }
       },
+      "CatalogModifierToggleOverrideType": {
+        "type": "string",
+        "enum": [
+          "NO",
+          "YES",
+          "NOT_SET"
+        ],
+        "x-enum-elements": [
+          {
+            "name": "NO",
+            "description": "False override"
+          },
+          {
+            "name": "YES",
+            "description": "True override"
+          },
+          {
+            "name": "NOT_SET",
+            "description": "No override"
+          }
+        ],
+        "description": "Item level overrides for bool attributes",
+        "x-release-status": "BETA"
+      },
       "CatalogObject": {
         "type": "object",
         "description": "The wrapper object for the catalog entries of a given object type.\n\nDepending on the `type` attribute value, a `CatalogObject` instance assumes a type-specific data to yield the corresponding type of catalog object.\n\nFor example, if `type=ITEM`, the `CatalogObject` instance must have the ITEM-specific data set on the `item_data` attribute. The resulting `CatalogObject` instance is also a `CatalogItem` instance.\n\nIn general, if `type=\u003cOBJECT_TYPE\u003e`, the `CatalogObject` instance must have the `\u003cOBJECT_TYPE\u003e`-specific data set on the `\u003cobject_type\u003e_data` attribute. The resulting `CatalogObject` instance is also a `Catalog\u003cObjectType\u003e` instance.\n\nFor a more detailed discussion of the Catalog data model, please see the\n[Design a Catalog](https://developer.squareup.com/docs/catalog-api/design-a-catalog) guide.",
@@ -10743,7 +10914,7 @@
           },
           "version": {
             "type": "integer",
-            "description": "The version of the object. When updating an object, the version supplied\nmust match the version in the database, otherwise the write will be rejected as conflicting.",
+            "description": "The version of the object. When updating an object, the version supplied should match\nthe version in the database. If it does not, the server attempts a three-way merge. If the\nclient's changes and the concurrent changes don't overlap, the merge succeeds silently. A\n`VERSION_MISMATCH` error is only returned when both sides changed the same field to different\nvalues.\n\nUse the same API version (`Square-Version` header) for both reading and writing catalog\nobjects. The server uses the API version on a write request to determine which missing fields\nthe client intentionally cleared versus which fields the client simply could not see at that\nversion. If a client reads an object at an older API version and writes it back at a newer\nversion, fields that were introduced between those two versions will be absent from the\nrequest, and the server will interpret that absence as an intentional clear.",
             "format": "int64"
           },
           "is_deleted": {
@@ -10769,7 +10940,7 @@
           },
           "present_at_all_locations": {
             "type": "boolean",
-            "description": "If `true`, this object is present at all locations (including future locations), except where specified in\nthe `absent_at_location_ids` field. If `false`, this object is not present at any locations (including future locations),\nexcept where specified in the `present_at_location_ids` field. If not specified, defaults to `true`.",
+            "description": "Controls whether this object is present at all locations, including future locations.\n\nMost object types have independent location control, including `TAX`, `DISCOUNT`, and\n`MODIFIER_LIST`.\n\n`ITEM` and `ITEM_VARIATION` have separate settings, but a variation can only be enabled\nat locations where its parent item is enabled. Disabling a variation everywhere is valid\neven when the parent item is enabled at specific locations.\n\n`MODIFIER` objects nested within a `MODIFIER_LIST` inherit location settings from their parent.\nSome object types, including `CATEGORY`, `IMAGE`, and `CUSTOM_ATTRIBUTE_DEFINITION`, must\nalways be globally enabled and cannot use location-specific fields.\n\nThe field operates in two modes. When true (the default), the object is available at\nall current and future locations except those in `absent_at_location_ids`. When false,\nthe object is available only at locations in `present_at_location_ids`. The unused\nlist in each mode is ignored.",
             "nullable": true
           },
           "present_at_location_ids": {
@@ -10777,7 +10948,7 @@
             "items": {
               "type": "string"
             },
-            "description": "A list of locations where the object is present, even if `present_at_all_locations` is `false`.\nThis can include locations that are deactivated.",
+            "description": "Locations where the object is present, used when `present_at_all_locations` is false.\n\nWhen `present_at_all_locations` is true, this field is ignored since the object is\nalready present everywhere. Can include deactivated locations. Empty strings are rejected.",
             "nullable": true
           },
           "absent_at_location_ids": {
@@ -10785,7 +10956,7 @@
             "items": {
               "type": "string"
             },
-            "description": "A list of locations where the object is not present, even if `present_at_all_locations` is `true`.\nThis can include locations that are deactivated.",
+            "description": "Locations where the object is not present, used when `present_at_all_locations` is true.\n\nWhen `present_at_all_locations` is false, this field is ignored since the object is\nalready absent everywhere except those in `present_at_location_ids`. Can include\ndeactivated locations. Empty strings are rejected.",
             "nullable": true
           },
           "item_data": {
@@ -10943,7 +11114,7 @@
           },
           "ordinal": {
             "type": "integer",
-            "description": "The order of the object within the context of the category.",
+            "description": "The position of this object within the specified category. When an item is assigned to a category,\nthe ordinal determines the item's position relative to other items in the same category. When used for a\nparent category reference, the ordinal determines the category's position among its sibling categories.",
             "format": "int64",
             "nullable": true
           }
@@ -11184,7 +11355,7 @@
             "items": {
               "type": "string"
             },
-            "description": " Unique IDs for any `CatalogObject` included in this product set. Any\nnumber of these catalog objects can be in an order for a pricing rule to apply.\n\nThis can be used with `product_ids_all` in a parent `CatalogProductSet` to\nmatch groups of products for a bulk discount, such as a discount for an\nentree and side combo.\n\nOnly one of `product_ids_all`, `product_ids_any`, or `all_products` can be set.\n\nMax: 500 catalog object IDs.",
+            "description": " Unique IDs for any `CatalogObject` included in this product set. Any\nnumber of these catalog objects can be in an order for a pricing rule to apply.\n\nThis can be used with `product_ids_all` in a parent `CatalogProductSet` to\nmatch groups of products for a bulk discount, such as a discount for an\nentree and side combo.\n\nOnly one of `product_ids_all`, `product_ids_any`, or `all_products` can be set.\n\nMax: 5000 catalog object IDs.",
             "nullable": true
           },
           "product_ids_all": {
@@ -11192,7 +11363,7 @@
             "items": {
               "type": "string"
             },
-            "description": "Unique IDs for any `CatalogObject` included in this product set.\nAll objects in this set must be included in an order for a pricing rule to apply.\n\nOnly one of `product_ids_all`, `product_ids_any`, or `all_products` can be set.\n\nMax: 500 catalog object IDs.",
+            "description": "Unique IDs for any `CatalogObject` included in this product set.\nAll objects in this set must be included in an order for a pricing rule to apply.\n\nOnly one of `product_ids_all`, `product_ids_any`, or `all_products` can be set.\n\nMax: 5000 catalog object IDs.",
             "nullable": true
           },
           "quantity_exact": {
@@ -14373,6 +14544,70 @@
         "description": "Indicates the country associated with another entity, such as a business.\nValues are in [ISO 3166-1-alpha-2 format](http://www.iso.org/iso/home/standards/country_codes.htm).",
         "x-release-status": "PUBLIC"
       },
+      "CreateBankAccountRequest": {
+        "type": "object",
+        "description": "Request object for linking a bank account to a Square account",
+        "x-release-status": "BETA",
+        "required": [
+          "idempotency_key",
+          "source_id"
+        ],
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "Unique ID. For more information, see the\n[Idempotency](https://developer.squareup.com/docs/working-with-apis/idempotency)."
+          },
+          "source_id": {
+            "type": "string",
+            "description": "The ID of the source that represents the bank account information to be stored. This field\naccepts the payment token created by WebSDK"
+          },
+          "customer_id": {
+            "type": "string",
+            "description": "The ID of the customer associated with the bank account to be stored."
+          }
+        },
+        "example": {
+          "customer_id": "HM3B2D5JKGZ69359BTEHXM2V8M",
+          "idempotency_key": "4e43559a-f0fd-47d3-9da2-7ea1f97d94be",
+          "source_id": "bnon:CA4SEHsQwr0rx6DbWLD5BQaqMnoYAQ"
+        }
+      },
+      "CreateBankAccountResponse": {
+        "type": "object",
+        "description": "Response object returned by CreateBankAccount.",
+        "x-release-status": "BETA",
+        "properties": {
+          "bank_account": {
+            "$ref": "#/components/schemas/BankAccount",
+            "description": "The 'BankAccount' that was created."
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Information on errors encountered during the request."
+          }
+        },
+        "example": {
+          "bank_account": {
+            "account_number_suffix": "000",
+            "account_type": "CHECKING",
+            "bank_name": "Citizens Bank",
+            "country": "US",
+            "creditable": true,
+            "currency": "USD",
+            "customer_id": "HM3B2D5JKGZ69359BTEHXM2V8M",
+            "debitable": true,
+            "fingerprint": "sq-1-mO3XNctJpTLL8uYowOWpioS8nQyTc838gcBo90254XonoEJ_c7Uw6yqL6qihFNY8fA",
+            "holder_name": "Nicola Snow",
+            "id": "bact:OxfBTiXgByaXds1K4GB",
+            "primary_bank_identification_number": "011401533",
+            "status": "VERIFIED",
+            "version": 2
+          }
+        }
+      },
       "CreateBookingCustomAttributeDefinitionRequest": {
         "type": "object",
         "description": "Represents a [CreateBookingCustomAttributeDefinition](api-endpoint:BookingCustomAttributes-CreateBookingCustomAttributeDefinition) request.",
@@ -15653,6 +15888,69 @@
           }
         }
       },
+      "CreateInventoryAdjustmentReasonRequest": {
+        "type": "object",
+        "description": "Represents an input to a call to [CreateInventoryAdjustmentReason](api-endpoint:Inventory-CreateInventoryAdjustmentReason).",
+        "x-release-status": "BETA",
+        "required": [
+          "idempotency_key",
+          "adjustment_reason"
+        ],
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "A client-supplied, universally unique identifier to make this\n[CreateInventoryAdjustmentReason](api-endpoint:Inventory-CreateInventoryAdjustmentReason)\nrequest idempotent.",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "adjustment_reason": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReason",
+            "description": "The custom inventory adjustment reason to create. Only custom\nadjustment reasons can be created."
+          }
+        },
+        "example": {
+          "adjustment_reason": {
+            "direction": "DECREASE",
+            "id": {
+              "type": "CUSTOM"
+            },
+            "name": "Donated to charity"
+          },
+          "idempotency_key": "27b2f2b1-1c2a-4b9e-8f3a-0d9c3a1e5b47"
+        }
+      },
+      "CreateInventoryAdjustmentReasonResponse": {
+        "type": "object",
+        "description": "Represents an output from a call to [CreateInventoryAdjustmentReason](api-endpoint:Inventory-CreateInventoryAdjustmentReason).",
+        "x-release-status": "BETA",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Errors encountered when the request fails."
+          },
+          "adjustment_reason": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReason",
+            "description": "The successfully created inventory adjustment reason."
+          }
+        },
+        "example": {
+          "adjustment_reason": {
+            "created_at": "2026-07-15T18:24:31.000Z",
+            "direction": "DECREASE",
+            "id": {
+              "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+              "type": "CUSTOM"
+            },
+            "is_deleted": false,
+            "name": "Donated to charity",
+            "updated_at": "2026-07-15T18:24:31.000Z"
+          },
+          "errors": []
+        }
+      },
       "CreateInvoiceAttachmentRequest": {
         "type": "object",
         "description": "Represents a [CreateInvoiceAttachment](api-endpoint:Invoices-CreateInvoiceAttachment) request.",
@@ -16336,51 +16634,6 @@
           }
         }
       },
-      "CreateMobileAuthorizationCodeRequest": {
-        "type": "object",
-        "description": "Defines the body parameters that can be provided in a request to the\n`CreateMobileAuthorizationCode` endpoint.",
-        "x-release-status": "DEPRECATED",
-        "properties": {
-          "location_id": {
-            "type": "string",
-            "description": "The Square location ID that the authorization code should be tied to.",
-            "minLength": 1,
-            "maxLength": 191
-          }
-        },
-        "example": {
-          "location_id": "YOUR_LOCATION_ID"
-        }
-      },
-      "CreateMobileAuthorizationCodeResponse": {
-        "type": "object",
-        "description": "Defines the fields that are included in the response body of\na request to the `CreateMobileAuthorizationCode` endpoint.",
-        "x-release-status": "DEPRECATED",
-        "properties": {
-          "authorization_code": {
-            "type": "string",
-            "description": "The generated authorization code that connects a mobile application instance\nto a Square account.",
-            "maxLength": 191
-          },
-          "expires_at": {
-            "type": "string",
-            "description": "The timestamp when `authorization_code` expires, in\n[RFC 3339](https://tools.ietf.org/html/rfc3339) format (for example, \"2016-09-04T23:59:33.123Z\").",
-            "minLength": 20,
-            "maxLength": 48
-          },
-          "errors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "description": "Any errors that occurred during the request."
-          }
-        },
-        "example": {
-          "authorization_code": "YOUR_MOBILE_AUTHORIZATION_CODE",
-          "expires_at": "2019-01-10T19:42:08Z"
-        }
-      },
       "CreateOrderCustomAttributeDefinitionRequest": {
         "type": "object",
         "description": "Represents a create request for an order custom attribute definition.",
@@ -16997,11 +17250,18 @@
           },
           "tip_money": {
             "$ref": "#/components/schemas/Money",
-            "description": "The amount designated as a tip, in addition to `amount_money`.\n\nThe amount must be specified in the smallest denomination of the applicable currency\n(for example, US dollar amounts are specified in cents). For more information, see\n[Working with Monetary Amounts](https://developer.squareup.com/docs/build-basics/working-with-monetary-amounts).\n\nThe currency code must match the currency associated with the business\nthat is accepting the payment."
+            "description": "The amount designated as a tip, in addition to `amount_money`.\n\nThe amount must be specified in the smallest denomination of the applicable currency\n(for example, US dollar amounts are specified in cents). For more information, see\n[Working with Monetary Amounts](https://developer.squareup.com/docs/build-basics/working-with-monetary-amounts).\n\nTips for external vendors such as a 3rd party delivery courier must be recorded using Order.service_charges.\n\nThe currency code must match the currency associated with the business\nthat is accepting the payment."
           },
           "app_fee_money": {
             "$ref": "#/components/schemas/Money",
             "description": "The amount of money that the developer is taking as a fee\nfor facilitating the payment on behalf of the seller.\n\nThe amount cannot be more than 90% of the total amount of the payment.\n\nThe amount must be specified in the smallest denomination of the applicable currency\n(for example, US dollar amounts are specified in cents). For more information, see\n[Working with Monetary Amounts](https://developer.squareup.com/docs/build-basics/working-with-monetary-amounts).\n\nThe fee currency code must match the currency associated with the seller\nthat is accepting the payment. The application must be from a developer\naccount in the same country and using the same currency code as the seller.\n\nFor more information about the application fee scenario, see\n[Take Payments and Collect Fees](https://developer.squareup.com/docs/payments-api/take-payments-and-collect-fees).\n\nTo set this field, `PAYMENTS_WRITE_ADDITIONAL_RECIPIENTS` OAuth permission is required.\nFor more information, see [Permissions](https://developer.squareup.com/docs/payments-api/take-payments-and-collect-fees#permissions)."
+          },
+          "app_fee_allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppFeeAllocation"
+            },
+            "description": "Details pertaining to recipients of the application fee. The sum of the amounts in the\napp_fee_allocations must equal the app_fee_money amount, if present. If populated, an\nallocation must be present for every party that expects to receive a portion of the application\nfee, including the application developer."
           },
           "delay_duration": {
             "type": "string",
@@ -22038,6 +22298,58 @@
         },
         "example": {}
       },
+      "DeleteInventoryAdjustmentReasonRequest": {
+        "type": "object",
+        "description": "Represents an input to a call to [DeleteInventoryAdjustmentReason](api-endpoint:Inventory-DeleteInventoryAdjustmentReason).",
+        "x-release-status": "BETA",
+        "required": [
+          "reason_id"
+        ],
+        "properties": {
+          "reason_id": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReasonId",
+            "description": "The identifier of the custom inventory adjustment reason to soft delete."
+          }
+        },
+        "example": {
+          "reason_id": {
+            "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+            "type": "CUSTOM"
+          }
+        }
+      },
+      "DeleteInventoryAdjustmentReasonResponse": {
+        "type": "object",
+        "description": "Represents an output from a call to [DeleteInventoryAdjustmentReason](api-endpoint:Inventory-DeleteInventoryAdjustmentReason).",
+        "x-release-status": "BETA",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Errors encountered when the request fails."
+          },
+          "adjustment_reason": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReason",
+            "description": "The successfully soft-deleted inventory adjustment reason."
+          }
+        },
+        "example": {
+          "adjustment_reason": {
+            "created_at": "2026-07-15T18:24:31.000Z",
+            "direction": "DECREASE",
+            "id": {
+              "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+              "type": "CUSTOM"
+            },
+            "is_deleted": true,
+            "name": "Charitable donation",
+            "updated_at": "2026-07-15T19:05:44.000Z"
+          },
+          "errors": []
+        }
+      },
       "DeleteInvoiceAttachmentResponse": {
         "type": "object",
         "description": "Represents a [DeleteInvoiceAttachment](api-endpoint:Invoices-DeleteInvoiceAttachment) response.",
@@ -22578,6 +22890,12 @@
           "show_itemized_cart": {
             "type": "boolean",
             "description": "Show the itemization screen prior to taking a payment. This field is only meaningful when the\ncheckout includes an order ID. Defaults to true.",
+            "nullable": true
+          },
+          "allow_auto_card_surcharge": {
+            "type": "boolean",
+            "description": "Controls whether the mobile client applies Auto Card Surcharge (ACS) during checkout.\nIf true, ACS is applied based on Dashboard configuration.\nIf false, ACS is not applied regardless of that configuration.\nFor more information, see [Add a Card Surcharge](https://developer.squareup.com/docs/terminal-api/additional-payment-checkout-features#add-a-card-surcharge).",
+            "x-release-status": "BETA",
             "nullable": true
           }
         }
@@ -23207,7 +23525,7 @@
           },
           "brand": {
             "type": "string",
-            "description": "The brand used for the `WALLET` payment. The brand can be `CASH_APP`, `PAYPAY`, `ALIPAY`,\n`RAKUTEN_PAY`, `AU_PAY`, `D_BARAI`, `MERPAY`, `WECHAT_PAY` or `UNKNOWN`.",
+            "description": "The brand used for the `WALLET` payment. The brand can be `CASH_APP`, `PAYPAY`, `ALIPAY`,\n`RAKUTEN_PAY`, `AU_PAY`, `D_BARAI`, `MERPAY`, `WECHAT_PAY`, `LIGHTNING` or `UNKNOWN`.",
             "maxLength": 50,
             "nullable": true
           },
@@ -23215,6 +23533,55 @@
             "$ref": "#/components/schemas/CashAppDetails",
             "description": "Brand-specific details for payments with the `brand` of `CASH_APP`.",
             "nullable": true
+          },
+          "lightning_details": {
+            "$ref": "#/components/schemas/LightningDetails",
+            "description": "Brand-specific details for payments with the `brand` of `LIGHTNING`.",
+            "nullable": true
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Information about errors encountered during the payment.",
+            "readOnly": true
+          }
+        }
+      },
+      "DisableBankAccountResponse": {
+        "type": "object",
+        "description": "Response object returned by `DisableBankAccount`.",
+        "x-release-status": "BETA",
+        "properties": {
+          "bank_account": {
+            "$ref": "#/components/schemas/BankAccount",
+            "description": "The disabled 'BankAccount'"
+          },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Information on errors encountered during the request."
+          }
+        },
+        "example": {
+          "bank_account": {
+            "account_number_suffix": "000",
+            "account_type": "CHECKING",
+            "bank_name": "Citizens Bank",
+            "country": "US",
+            "creditable": true,
+            "currency": "USD",
+            "customer_id": "HM3B2D5JKGZ69359BTEHXM2V8M",
+            "debitable": true,
+            "fingerprint": "sq-1-mO3XNctJpTLL8uYowOWpioS8nQyTc838gcBo90254XonoEJ_c7Uw6yqL6qihFNY8fA",
+            "holder_name": "Nicola Snow",
+            "id": "bact:OxfBTiXgByaXds1K4GB",
+            "primary_bank_identification_number": "011401533",
+            "status": "DISABLED",
+            "version": 3
           }
         }
       },
@@ -24629,6 +24996,18 @@
         "description": "Determines item visibility in Ecom (Online Store) and Online Checkout.",
         "x-release-status": "PUBLIC"
       },
+      "ElectronicMoneyDetails": {
+        "type": "object",
+        "description": "Details specific to electronic money payments.",
+        "x-release-status": "BETA",
+        "properties": {
+          "felica_details": {
+            "$ref": "#/components/schemas/FelicaDetails",
+            "description": "Details specific to FeliCa payments.",
+            "nullable": true
+          }
+        }
+      },
       "Employee": {
         "type": "object",
         "description": "An employee object that is used by the external API.\n\nDEPRECATED at version 2020-08-26. Replaced by [TeamMember](entity:TeamMember).",
@@ -24939,6 +25318,7 @@
           "UNSUPPORTED_LOYALTY_REWARD_TIER",
           "LOCATION_MISMATCH",
           "ORDER_UNPAID_NOT_RETURNABLE",
+          "PARTIAL_PAYMENT_DELAY_CAPTURE_NOT_SUPPORTED",
           "IDEMPOTENCY_KEY_REUSED",
           "UNEXPECTED_VALUE",
           "SANDBOX_NOT_SUPPORTED",
@@ -24954,6 +25334,7 @@
           "PLAID_ERROR",
           "PLAID_ERROR_ITEM_LOGIN_REQUIRED",
           "PLAID_ERROR_RATE_LIMIT",
+          "PAYMENT_SOURCE_NOT_ENABLED_FOR_TARGET",
           "CARD_DECLINED",
           "VERIFY_CVV_FAILURE",
           "VERIFY_AVS_FAILURE",
@@ -25424,7 +25805,7 @@
           },
           {
             "name": "GIFT_CARD_AVAILABLE_AMOUNT",
-            "description": "When a Gift Card is a payment source, you can allow taking a partial payment\nby adding the `accept_partial_authorization` parameter in the request.\nHowever, taking such a partial payment does not work if your request also includes\n`tip_money`, `app_fee_money`, or both. Square declines such payments and returns\nthe `GIFT_CARD_AVAILABLE_AMOUNT` error.\nFor more information, see\n[CreatePayment errors (additional information)](https://developer.squareup.com/docs/payments-api/error-codes#createpayment-errors-additional-information).",
+            "description": "Provides the available balance on a Square gift card when a gift card payment fails due to insufficient funds.\nThis error is returned with an `INSUFFICIENT_FUNDS` error and contains the balance in the smallest denomination\nof the applicable currency. [Learn more](https://developer.squareup.com/docs/payments-api/error-codes#gift_card_available_amount)\nabout this error code.\n\nYou can use the `accept_partial_authorization` field in a `CreatePayment` request to configure a payment flow that uses\nthe available balance and allows collecting additional payments.",
             "error-category": "PAYMENT_METHOD_ERROR"
           },
           {
@@ -25543,6 +25924,11 @@
             "error-category": "INVALID_REQUEST_ERROR"
           },
           {
+            "name": "PARTIAL_PAYMENT_DELAY_CAPTURE_NOT_SUPPORTED",
+            "description": "Delay capture of a partial payment is not supported.",
+            "error-category": "INVALID_REQUEST_ERROR"
+          },
+          {
             "name": "IDEMPOTENCY_KEY_REUSED",
             "description": "The provided idempotency key has already been used.",
             "error-category": "INVALID_REQUEST_ERROR"
@@ -25616,6 +26002,11 @@
             "name": "PLAID_ERROR_RATE_LIMIT",
             "description": "Plaid error - RATE_LIMIT",
             "error-category": "EXTERNAL_VENDOR_ERROR"
+          },
+          {
+            "name": "PAYMENT_SOURCE_NOT_ENABLED_FOR_TARGET",
+            "description": "The provided merchant or location is not enabled to accept\nthe requested payment source.",
+            "error-category": "INVALID_REQUEST_ERROR"
           },
           {
             "name": "CARD_DECLINED",
@@ -25855,7 +26246,8 @@
         "type": "string",
         "enum": [
           "LEAST_EXPENSIVE",
-          "MOST_EXPENSIVE"
+          "MOST_EXPENSIVE",
+          "MOST_EXPENSIVE_LOWEST_VALUE"
         ],
         "x-enum-elements": [
           {
@@ -25865,6 +26257,10 @@
           {
             "name": "MOST_EXPENSIVE",
             "description": "The most expensive matched product is excluded from the pricing rule.\nIf multiple products have the same price and all qualify as least expensive,\none will be excluded at random.\n\nThis guarantees that the most expensive product is purchased at full price."
+          },
+          {
+            "name": "MOST_EXPENSIVE_LOWEST_VALUE",
+            "description": "Like MOST_EXPENSIVE, the most expensive matched product is excluded and\npurchased at full price. However, instead of maximizing the discount value on\nthe remaining products (standard BOGO), the discount is applied to the CHEAPEST\nremaining eligible product.\n\nUsed by the \"lowest-value free item\" coupon shape where the intent is to make\nthe least expensive item free, not the most valuable one."
           }
         ],
         "description": "Indicates which products matched by a CatalogPricingRule\nwill be excluded if the pricing rule uses an exclude set.",
@@ -25901,6 +26297,58 @@
             "nullable": true
           }
         }
+      },
+      "FelicaDetails": {
+        "type": "object",
+        "description": "Details for Felica payments.",
+        "x-release-status": "BETA",
+        "properties": {
+          "terminal_id": {
+            "type": "string",
+            "description": "The terminal id for a Felica payment.",
+            "maxLength": 255,
+            "nullable": true
+          },
+          "felica_masked_card_number": {
+            "type": "string",
+            "description": "The masked card number for a Felica payment.",
+            "nullable": true
+          },
+          "felica_brand": {
+            "$ref": "#/components/schemas/FelicaDetailsFelicaBrand",
+            "description": "The Felica sub-brand of the payment.\nSee [FelicaBrand](#type-felicabrand) for possible values",
+            "nullable": true
+          }
+        }
+      },
+      "FelicaDetailsFelicaBrand": {
+        "type": "string",
+        "enum": [
+          "UNKNOWN",
+          "FELICA_ID",
+          "FELICA_TRANSPORTATION",
+          "FELICA_QP"
+        ],
+        "x-enum-elements": [
+          {
+            "name": "UNKNOWN",
+            "description": ""
+          },
+          {
+            "name": "FELICA_ID",
+            "description": ""
+          },
+          {
+            "name": "FELICA_TRANSPORTATION",
+            "description": ""
+          },
+          {
+            "name": "FELICA_QP",
+            "description": ""
+          }
+        ],
+        "description": "A Felica card's \"sub-brand\"--the actual brand on the Felica card",
+        "x-release-status": "BETA"
       },
       "FilterValue": {
         "type": "object",
@@ -26012,6 +26460,12 @@
             "description": "Describes delivery details of an order fulfillment.",
             "x-release-status": "BETA",
             "nullable": true
+          },
+          "in_store_details": {
+            "$ref": "#/components/schemas/FulfillmentInStoreDetails",
+            "description": "Contains details for an in-store fulfillment. These details are required when the fulfillment\ntype is `IN_STORE`.",
+            "x-release-status": "BETA",
+            "nullable": true
           }
         }
       },
@@ -26027,7 +26481,7 @@
           },
           "schedule_type": {
             "$ref": "#/components/schemas/FulfillmentDeliveryDetailsOrderFulfillmentDeliveryDetailsScheduleType",
-            "description": "Indicates the fulfillment delivery schedule type. If `SCHEDULED`, then\n`deliver_at` is required. If `ASAP`, then `prep_time_duration` is required. The default is `SCHEDULED`.\nSee [OrderFulfillmentDeliveryDetailsScheduleType](#type-orderfulfillmentdeliverydetailsscheduletype) for possible values",
+            "description": "Indicates the fulfillment delivery schedule type. If `SCHEDULED`, then\n`deliver_at` is required. The default is `SCHEDULED`.\nSee [OrderFulfillmentDeliveryDetailsScheduleType](#type-orderfulfillmentdeliverydetailsscheduletype) for possible values",
             "nullable": true
           },
           "placed_at": {
@@ -26037,17 +26491,17 @@
           },
           "deliver_at": {
             "type": "string",
-            "description": "The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates)\nthat represents the start of the delivery period.\nWhen the fulfillment `schedule_type` is `ASAP`, the field is automatically\nset to the current time plus the `prep_time_duration`.\nOtherwise, the application can set this field while the fulfillment `state` is\n`PROPOSED`, `RESERVED`, or `PREPARED` (any time before the\nterminal state such as `COMPLETED`, `CANCELED`, and `FAILED`).\n\nThe timestamp must be in RFC 3339 format\n(for example, \"2016-09-04T23:59:33.123Z\").",
+            "description": "The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates)\nthat represents the start of the delivery period.\nThe application can set this field while the fulfillment `state` is\n`PROPOSED`, `RESERVED`, or `PREPARED` (any time before the\nterminal state such as `COMPLETED`, `CANCELED`, and `FAILED`).\n\nThe timestamp must be in RFC 3339 format\n(for example, \"2016-09-04T23:59:33.123Z\").\n\nFor fulfillments with the schedule type `ASAP`, this is automatically set\nto the current time plus `prep_time_duration`, if available.",
             "nullable": true
           },
           "prep_time_duration": {
             "type": "string",
-            "description": "The duration of time it takes to prepare and deliver this fulfillment.\nThe duration must be in RFC 3339 format (for example, \"P1W3D\").",
+            "description": "The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates)\nneeded to prepare and deliver this fulfillment.\nThe duration must be in RFC 3339 format (for example, \"PT30M\" for 30 minutes). Don't confuse\n\"M\" for months with \"M\" for minutes. \"P5M\" means 5 months, while \"PT5M\" means 5 minutes.",
             "nullable": true
           },
           "delivery_window_duration": {
             "type": "string",
-            "description": "The time period after `deliver_at` in which to deliver the order.\nApplications can set this field when the fulfillment `state` is\n`PROPOSED`, `RESERVED`, or `PREPARED` (any time before the terminal state\nsuch as `COMPLETED`, `CANCELED`, and `FAILED`).\n\nThe duration must be in RFC 3339 format (for example, \"P1W3D\").",
+            "description": "The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates)\nafter `deliver_at` in which to deliver the order.\nApplications can set this field when the fulfillment `state` is\n`PROPOSED`, `RESERVED`, or `PREPARED` (any time before the terminal state\nsuch as `COMPLETED`, `CANCELED`, and `FAILED`).\n\nThe duration must be in RFC 3339 format (for example, \"PT30M\" for 30 minutes). Don't confuse\n\"M\" for months with \"M\" for minutes. \"P5M\" means 5 months, while \"PT5M\" means 5 minutes.",
             "nullable": true
           },
           "note": {
@@ -26099,7 +26553,7 @@
           },
           "courier_pickup_window_duration": {
             "type": "string",
-            "description": "The time period after `courier_pickup_at` in which the courier should pick up the order.\nThe duration must be in RFC 3339 format (for example, \"P1W3D\").",
+            "description": "The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates)\nafter `courier_pickup_at` in which the courier should pick up the order.\nThe duration must be in RFC 3339 format (for example, \"PT30M\" for 30 minutes). Don't confuse\n\"M\" for months with \"M\" for minutes. \"P5M\" means 5 months, while \"PT5M\" means 5 minutes.",
             "nullable": true
           },
           "is_no_contact_delivery": {
@@ -26218,6 +26672,49 @@
         "description": "The `line_item_application` describes what order line items this fulfillment applies\nto. It can be `ALL` or `ENTRY_LIST` with a supplied list of fulfillment entries.",
         "x-release-status": "BETA"
       },
+      "FulfillmentInStoreDetails": {
+        "type": "object",
+        "description": "Contains the details necessary to fulfill an in-store order.",
+        "x-release-status": "BETA",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "A note to provide additional instructions about the in-store fulfillment\ndisplayed in the Square Point of Sale application and set by the API.",
+            "maxLength": 550,
+            "nullable": true
+          },
+          "recipient": {
+            "$ref": "#/components/schemas/FulfillmentRecipient",
+            "description": "Information about the person to receive this in-store fulfillment.",
+            "nullable": true
+          },
+          "placed_at": {
+            "type": "string",
+            "description": "The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates)\nindicating when the fulfillment was placed. The timestamp must be in RFC 3339 format\n(for example, \"2016-09-04T23:59:33.123Z\").",
+            "nullable": true
+          },
+          "completed_at": {
+            "type": "string",
+            "description": "The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates)\nindicating when the fulfillment was completed. This field is automatically set when the\nfulfillment `state` changes to `COMPLETED`. The timestamp must be in RFC 3339 format\n(for example, \"2016-09-04T23:59:33.123Z\").",
+            "readOnly": true
+          },
+          "in_progress_at": {
+            "type": "string",
+            "description": "The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates)\nindicates when the seller started processing the fulfillment.\nThis field is automatically set when the fulfillment `state` changes to `RESERVED`.\nThe timestamp must be in RFC 3339 format (for example, \"2016-09-04T23:59:33.123Z\").",
+            "readOnly": true
+          },
+          "prepared_at": {
+            "type": "string",
+            "description": "The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates)\nindicating when the fulfillment was moved to the `PREPARED` state, which indicates that the\nfulfillment is ready. The timestamp must be in RFC 3339 format (for example, \"2016-09-04T23:59:33.123Z\").",
+            "readOnly": true
+          },
+          "canceled_at": {
+            "type": "string",
+            "description": "The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates)\nindicating when the fulfillment was canceled. This field is automatically set when the\nfulfillment `state` changes to `CANCELED`. The timestamp must be in RFC 3339 format\n(for example, \"2016-09-04T23:59:33.123Z\").",
+            "readOnly": true
+          }
+        }
+      },
       "FulfillmentPickupDetails": {
         "type": "object",
         "description": "Contains details necessary to fulfill a pickup order.",
@@ -26235,7 +26732,7 @@
           },
           "auto_complete_duration": {
             "type": "string",
-            "description": "The duration of time after which an in progress pickup fulfillment is automatically moved\nto the `COMPLETED` state. The duration must be in RFC 3339 format (for example, \"P1W3D\").\n\nIf not set, this pickup fulfillment remains in progress until it is canceled or completed.",
+            "description": "The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates)\nafter which an in-progress pickup fulfillment is automatically moved\nto the `COMPLETED` state. The duration must be in RFC 3339 format (for example, \"PT4H\" for 4 hours).\n\nIf not set, this pickup fulfillment remains in progress until it is canceled or completed.",
             "nullable": true
           },
           "schedule_type": {
@@ -26245,17 +26742,17 @@
           },
           "pickup_at": {
             "type": "string",
-            "description": "The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates)\nthat represents the start of the pickup window. Must be in RFC 3339 timestamp format, e.g.,\n\"2016-09-04T23:59:33.123Z\".\n\nFor fulfillments with the schedule type `ASAP`, this is automatically set\nto the current time plus the expected duration to prepare the fulfillment.",
+            "description": "The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates)\nthat represents the start of the pickup window. Must be in RFC 3339 timestamp format, e.g.,\n\"2016-09-04T23:59:33.123Z\".\n\nFor fulfillments with the schedule type `ASAP`, this is automatically set\nto the current time plus `prep_time_duration`, if available.",
             "nullable": true
           },
           "pickup_window_duration": {
             "type": "string",
-            "description": "The window of time in which the order should be picked up after the `pickup_at` timestamp.\nMust be in RFC 3339 duration format, e.g., \"P1W3D\". Can be used as an\ninformational guideline for merchants.",
+            "description": "The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates)\nin which the order should be picked up after the `pickup_at` timestamp.\nThe duration must be in RFC 3339 format (for example, \"PT30M\" for 30 minutes). Don't confuse\n\"M\" for months with \"M\" for minutes. \"P5M\" means 5 months, while \"PT5M\" means 5 minutes.\n\nCan be used as an informational guideline for merchants.",
             "nullable": true
           },
           "prep_time_duration": {
             "type": "string",
-            "description": "The duration of time it takes to prepare this fulfillment.\nThe duration must be in RFC 3339 format (for example, \"P1W3D\").",
+            "description": "The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates)\nneeded to prepare this fulfillment.\nThe duration must be in RFC 3339 format (for example, \"PT30M\" for 30 minutes). Don't confuse\n\"M\" for months with \"M\" for minutes. \"P5M\" means 5 months, while \"PT5M\" means 5 minutes.",
             "nullable": true
           },
           "note": {
@@ -26382,7 +26879,7 @@
           "phone_number": {
             "type": "string",
             "description": "The phone number of the fulfillment recipient. This field is required.\n\nIf provided, the phone number overrides the corresponding customer profile value\nindicated by `customer_id`.",
-            "maxLength": 17,
+            "maxLength": 18,
             "nullable": true
           },
           "address": {
@@ -26418,7 +26915,7 @@
           "shipping_type": {
             "type": "string",
             "description": "A description of the type of shipping product purchased from the carrier\n(such as First Class, Priority, or Express).",
-            "maxLength": 50,
+            "maxLength": 255,
             "nullable": true
           },
           "tracking_number": {
@@ -26526,7 +27023,8 @@
         "enum": [
           "PICKUP",
           "SHIPMENT",
-          "DELIVERY"
+          "DELIVERY",
+          "IN_STORE"
         ],
         "x-enum-elements": [
           {
@@ -26540,6 +27038,10 @@
           {
             "name": "DELIVERY",
             "description": "A courier to deliver the fulfillment."
+          },
+          {
+            "name": "IN_STORE",
+            "description": "A customer to receive the fulfillment within the seller's physical [location](entity:Location)."
           }
         ],
         "description": "The type of fulfillment.",
@@ -26585,33 +27087,34 @@
         "description": "Response object returned by `GetBankAccount`.",
         "x-release-status": "PUBLIC",
         "properties": {
+          "bank_account": {
+            "$ref": "#/components/schemas/BankAccount",
+            "description": "The requested `BankAccount` object."
+          },
           "errors": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/Error"
             },
             "description": "Information on errors encountered during the request."
-          },
-          "bank_account": {
-            "$ref": "#/components/schemas/BankAccount",
-            "description": "The requested `BankAccount` object."
           }
         },
         "example": {
           "bank_account": {
-            "account_number_suffix": "971",
+            "account_number_suffix": "000",
             "account_type": "CHECKING",
-            "bank_name": "Bank Name",
+            "bank_name": "Citizens Bank",
             "country": "US",
-            "creditable": false,
+            "creditable": true,
             "currency": "USD",
-            "debitable": false,
-            "holder_name": "Jane Doe",
-            "id": "w3yRgCGYQnwmdl0R3GB",
-            "location_id": "S8GWD5example",
-            "primary_bank_identification_number": "112200303",
-            "status": "VERIFICATION_IN_PROGRESS",
-            "version": 5
+            "customer_id": "HM3B2D5JKGZ69359BTEHXM2V8M",
+            "debitable": true,
+            "fingerprint": "sq-1-mO3XNctJpTLL8uYowOWpioS8nQyTc838gcBo90254XonoEJ_c7Uw6yqL6qihFNY8fA",
+            "holder_name": "Nicola Snow",
+            "id": "bact:OxfBTiXgByaXds1K4GB",
+            "primary_bank_identification_number": "011401533",
+            "status": "VERIFIED",
+            "version": 2
           }
         }
       },
@@ -28667,9 +29170,15 @@
             "description": "The [inventory state](entity:InventoryState) of the related quantity\nof items after the adjustment.\nSee [InventoryState](#type-inventorystate) for possible values",
             "nullable": true
           },
-          "location_id": {
+          "from_location_id": {
             "type": "string",
-            "description": "The Square-generated ID of the [Location](entity:Location) where the related\nquantity of items is being tracked.",
+            "description": "The Square-generated ID of the [Location](entity:Location) where the related\nquantity of items is being tracked before the adjustment.",
+            "maxLength": 100,
+            "nullable": true
+          },
+          "to_location_id": {
+            "type": "string",
+            "description": "The Square-generated ID of the [Location](entity:Location) where the related\nquantity of items is being tracked after the adjustment.",
             "maxLength": 100,
             "nullable": true
           },
@@ -28754,6 +29263,31 @@
             "description": "An adjustment group bundling the related adjustments of item variations through stock conversions in a single inventory event.",
             "readOnly": true,
             "x-release-status": "BETA"
+          },
+          "cost_money": {
+            "$ref": "#/components/schemas/Money",
+            "description": "The total amount paid by the merchant to the supplying vendor for these units of the product.\nThis field is only applicable for stock receive adjustments that introduce stock into the system (from_state is NONE or UNLINKED_RETURN).\nMay be empty.\nThis field will only accept writes if the merchant has an active subscription for either Retail Plus, Restaurants Plus, or Restaurants Premium.",
+            "x-release-status": "BETA",
+            "nullable": true
+          },
+          "vendor_id": {
+            "type": "string",
+            "description": "The Square-generated ID of the Vendor from which the merchant purchased this product.\nThis field is only applicable for stock receive adjustments that introduce stock into the system (from_state is NONE or UNLINKED_RETURN).\nThis field will only accept writes if the merchant has an active subscription for either Retail Plus, Restaurants Plus, or Restaurants Premium.",
+            "maxLength": 100,
+            "x-release-status": "BETA",
+            "nullable": true
+          },
+          "physical_count_id": {
+            "type": "string",
+            "description": "The Square-generated ID of the InventoryPhysicalCount (recount) that generated this adjustment, if applicable.\nThe quantity of an adjustment generated by a physical count cannot be edited.",
+            "readOnly": true,
+            "x-release-status": "BETA"
+          },
+          "reason_id": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReasonId",
+            "description": "Identifies the reason for this inventory adjustment.",
+            "x-release-status": "BETA",
+            "nullable": true
           }
         }
       },
@@ -28784,6 +29318,175 @@
             "readOnly": true
           }
         }
+      },
+      "InventoryAdjustmentReason": {
+        "type": "object",
+        "description": "Represents an inventory adjustment reason.",
+        "x-release-status": "BETA",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReasonId",
+            "description": "The identifier for this inventory adjustment reason."
+          },
+          "name": {
+            "type": "string",
+            "description": "The seller-facing name for a custom inventory adjustment reason. This\nfield is empty for standard and system-generated adjustment reasons.",
+            "maxLength": 50,
+            "nullable": true
+          },
+          "direction": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReasonDirection",
+            "description": "Indicates whether this inventory adjustment reason increases or\ndecreases inventory. This field is set for custom reasons and for standard\nseller-selectable reasons. It is empty for system-generated inventory\nevents.\nSee [Direction](#type-direction) for possible values",
+            "nullable": true
+          },
+          "created_at": {
+            "type": "string",
+            "description": "An RFC 3339-formatted timestamp that indicates when the custom\nadjustment reason was created. This field is empty for standard\nadjustment reasons.",
+            "maxLength": 34,
+            "readOnly": true
+          },
+          "updated_at": {
+            "type": "string",
+            "description": "An RFC 3339-formatted timestamp that indicates when the custom\nadjustment reason was last updated. This field is empty for standard\nadjustment reasons.",
+            "maxLength": 34,
+            "readOnly": true
+          },
+          "is_deleted": {
+            "type": "boolean",
+            "description": "Indicates whether this custom inventory adjustment reason has been\ndeleted. Deleted custom reasons can still be retrieved by ID, but are\nomitted from list responses unless deleted reasons are explicitly included.\nTo restore a deleted custom reason, call\n[RestoreInventoryAdjustmentReason](api-endpoint:Inventory-RestoreInventoryAdjustmentReason).\nThis field is always `false` for standard and system-generated adjustment\nreasons.",
+            "nullable": true
+          }
+        }
+      },
+      "InventoryAdjustmentReasonDirection": {
+        "type": "string",
+        "enum": [
+          "INCREASE",
+          "DECREASE"
+        ],
+        "x-enum-elements": [
+          {
+            "name": "INCREASE",
+            "description": ""
+          },
+          {
+            "name": "DECREASE",
+            "description": ""
+          }
+        ],
+        "x-release-status": "BETA"
+      },
+      "InventoryAdjustmentReasonId": {
+        "type": "object",
+        "description": "Identifies a standard or custom inventory adjustment reason.",
+        "x-release-status": "BETA",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReasonIdType",
+            "description": "The adjustment reason type.\nSee [Type](#type-type) for possible values"
+          },
+          "custom_reason_id": {
+            "type": "string",
+            "description": "The Square-generated ID of the custom adjustment reason. This field\nis only set when `type` is `CUSTOM`.",
+            "maxLength": 100,
+            "nullable": true
+          }
+        }
+      },
+      "InventoryAdjustmentReasonIdType": {
+        "type": "string",
+        "enum": [
+          "RECEIVED",
+          "DAMAGED",
+          "THEFT",
+          "LOST",
+          "RETURNED",
+          "SPOILAGE_WASTE",
+          "SAMPLES_PROMOTIONAL",
+          "INTERNAL_USE",
+          "VENDOR_RETURN",
+          "PRODUCTION_WASTE",
+          "SALE",
+          "RECOUNT",
+          "TRANSFER",
+          "IN_TRANSIT",
+          "CANCELED_SALE",
+          "CUSTOM"
+        ],
+        "x-enum-elements": [
+          {
+            "name": "RECEIVED",
+            "description": ""
+          },
+          {
+            "name": "DAMAGED",
+            "description": ""
+          },
+          {
+            "name": "THEFT",
+            "description": ""
+          },
+          {
+            "name": "LOST",
+            "description": ""
+          },
+          {
+            "name": "RETURNED",
+            "description": ""
+          },
+          {
+            "name": "SPOILAGE_WASTE",
+            "description": ""
+          },
+          {
+            "name": "SAMPLES_PROMOTIONAL",
+            "description": ""
+          },
+          {
+            "name": "INTERNAL_USE",
+            "description": ""
+          },
+          {
+            "name": "VENDOR_RETURN",
+            "description": ""
+          },
+          {
+            "name": "PRODUCTION_WASTE",
+            "description": ""
+          },
+          {
+            "name": "SALE",
+            "description": ""
+          },
+          {
+            "name": "RECOUNT",
+            "description": ""
+          },
+          {
+            "name": "TRANSFER",
+            "description": ""
+          },
+          {
+            "name": "IN_TRANSIT",
+            "description": ""
+          },
+          {
+            "name": "CANCELED_SALE",
+            "description": ""
+          },
+          {
+            "name": "CUSTOM",
+            "description": ""
+          }
+        ],
+        "description": "The type of inventory adjustment reason.\n\nCustom reasons use `CUSTOM` and include a `custom_reason_id`. Standard\nseller-selectable reasons use `RECEIVED`, `DAMAGED`, `THEFT`, `LOST`,\n`RETURNED`, `SPOILAGE_WASTE`, `SAMPLES_PROMOTIONAL`, `INTERNAL_USE`,\n`VENDOR_RETURN`, or `PRODUCTION_WASTE`.\n\nThe writable standard reasons with direction `INCREASE` are `RECEIVED`\nand `RETURNED`. The writable standard reasons with direction `DECREASE`\nare `DAMAGED`, `THEFT`, `LOST`, `SPOILAGE_WASTE`,\n`SAMPLES_PROMOTIONAL`, `INTERNAL_USE`, `VENDOR_RETURN`, and\n`PRODUCTION_WASTE`.\n\nThe `SALE`, `RECOUNT`, `TRANSFER`, `IN_TRANSIT`, and `CANCELED_SALE`\nvalues identify system-generated inventory events. These values can be\nreturned by Square, but cannot be used when writing inventory adjustments.",
+        "x-release-status": "BETA"
       },
       "InventoryAlertType": {
         "type": "string",
@@ -28824,11 +29527,6 @@
             "description": "Contains details about the inventory adjustment when `type` is\n`ADJUSTMENT`, and is unset for all other change types.",
             "nullable": true
           },
-          "transfer": {
-            "$ref": "#/components/schemas/InventoryTransfer",
-            "description": "Contains details about the inventory transfer when `type` is\n`TRANSFER`, and is unset for all other change types.\n\n_Note:_ An [InventoryTransfer](entity:InventoryTransfer) object can only be set in the input to the\n[BatchChangeInventory](api-endpoint:Inventory-BatchChangeInventory) endpoint when the seller has an active Retail Plus subscription.",
-            "nullable": true
-          },
           "measurement_unit": {
             "$ref": "#/components/schemas/CatalogMeasurementUnit",
             "description": "The [CatalogMeasurementUnit](entity:CatalogMeasurementUnit) object representing the catalog measurement unit associated with the inventory change.",
@@ -28845,8 +29543,7 @@
         "type": "string",
         "enum": [
           "PHYSICAL_COUNT",
-          "ADJUSTMENT",
-          "TRANSFER"
+          "ADJUSTMENT"
         ],
         "x-enum-elements": [
           {
@@ -28856,10 +29553,6 @@
           {
             "name": "ADJUSTMENT",
             "description": "The change occurred as part of the normal lifecycle of goods\n(e.g., as an inventory adjustment)."
-          },
-          {
-            "name": "TRANSFER",
-            "description": "The change occurred as part of an inventory transfer."
           }
         ],
         "description": "Indicates how the inventory change was applied to a tracked product quantity.",
@@ -28867,7 +29560,7 @@
       },
       "InventoryCount": {
         "type": "object",
-        "description": "Represents Square-estimated quantity of items in a particular state at a\nparticular seller location based on the known history of physical counts and\ninventory adjustments.",
+        "description": "Represents Square-estimated quantity of items in a particular state at a\nparticular seller location based on the known history of physical counts and\ninventory adjustments. The absence of an inventory count indicates that the\ncatalog object hasn't interacted with the given inventory state at the given location.",
         "x-release-status": "PUBLIC",
         "properties": {
           "catalog_object_id": {
@@ -29082,6 +29775,12 @@
             "description": "An RFC 3339-formatted timestamp that indicates when the physical count is received.",
             "maxLength": 34,
             "readOnly": true
+          },
+          "adjustment_id": {
+            "type": "string",
+            "description": "The Square-generated ID of the InventoryAdjustment that was generated by this physical count in order to\nadjust the current stock count to reflect the re-counted quantity.\nThis field may be empty if the merchant does not have an active subscription for either Retail Plus, Restaurants Plus, or Restaurants Premium.",
+            "readOnly": true,
+            "x-release-status": "BETA"
           }
         }
       },
@@ -29103,7 +29802,8 @@
           "COMPOSED",
           "DECOMPOSED",
           "SUPPORTED_BY_NEWER_VERSION",
-          "IN_TRANSIT"
+          "IN_TRANSIT",
+          "UNTRACKED"
         ],
         "x-enum-elements": [
           {
@@ -29169,92 +29869,14 @@
           {
             "name": "IN_TRANSIT",
             "description": "The related quantity of items are in transit between locations. **READ-ONLY:** the Inventory API cannot currently be used to move quantities to or from this inventory state."
+          },
+          {
+            "name": "UNTRACKED",
+            "description": "The related quantity of items are untracked."
           }
         ],
         "description": "Indicates the state of a tracked item quantity in the lifecycle of goods.",
         "x-release-status": "PUBLIC"
-      },
-      "InventoryTransfer": {
-        "type": "object",
-        "description": "Represents the transfer of a quantity of product inventory at a\nparticular time from one location to another.",
-        "x-release-status": "PUBLIC",
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "A unique ID generated by Square for the\n`InventoryTransfer`.",
-            "maxLength": 100
-          },
-          "reference_id": {
-            "type": "string",
-            "description": "An optional ID provided by the application to tie the\n`InventoryTransfer` to an external system.",
-            "maxLength": 255,
-            "nullable": true
-          },
-          "state": {
-            "$ref": "#/components/schemas/InventoryState",
-            "description": "The [inventory state](entity:InventoryState) for the quantity of\nitems being transferred.\nSee [InventoryState](#type-inventorystate) for possible values",
-            "nullable": true
-          },
-          "from_location_id": {
-            "type": "string",
-            "description": "The Square-generated ID of the [Location](entity:Location) where the related\nquantity of items was tracked before the transfer.",
-            "maxLength": 100,
-            "nullable": true
-          },
-          "to_location_id": {
-            "type": "string",
-            "description": "The Square-generated ID of the [Location](entity:Location) where the related\nquantity of items was tracked after the transfer.",
-            "maxLength": 100,
-            "nullable": true
-          },
-          "catalog_object_id": {
-            "type": "string",
-            "description": "The Square-generated ID of the\n[CatalogObject](entity:CatalogObject) being tracked.",
-            "maxLength": 100,
-            "nullable": true
-          },
-          "catalog_object_type": {
-            "type": "string",
-            "description": "The [type](entity:CatalogObjectType) of the [CatalogObject](entity:CatalogObject) being tracked. \n\nThe Inventory API supports setting and reading the `\"catalog_object_type\": \"ITEM_VARIATION\"` field value. \nIn addition, it can also read the `\"catalog_object_type\": \"ITEM\"` field value that is set by the Square Restaurants app.",
-            "maxLength": 14,
-            "nullable": true
-          },
-          "quantity": {
-            "type": "string",
-            "description": "The number of items affected by the transfer as a decimal string.\nCan support up to 5 digits after the decimal point.",
-            "maxLength": 26,
-            "nullable": true
-          },
-          "occurred_at": {
-            "type": "string",
-            "description": "A client-generated RFC 3339-formatted timestamp that indicates when\nthe transfer took place. For write actions, the `occurred_at` timestamp\ncannot be older than 24 hours or in the future relative to the time of the\nrequest.",
-            "maxLength": 34,
-            "nullable": true
-          },
-          "created_at": {
-            "type": "string",
-            "description": "An RFC 3339-formatted timestamp that indicates when Square\nreceived the transfer request.",
-            "maxLength": 34,
-            "readOnly": true
-          },
-          "source": {
-            "$ref": "#/components/schemas/SourceApplication",
-            "description": "Information about the application that initiated the\ninventory transfer.",
-            "readOnly": true
-          },
-          "employee_id": {
-            "type": "string",
-            "description": "The Square-generated ID of the [Employee](entity:Employee) responsible for the\ninventory transfer.",
-            "maxLength": 100,
-            "nullable": true
-          },
-          "team_member_id": {
-            "type": "string",
-            "description": "The Square-generated ID of the [Team Member](entity:TeamMember) responsible for the\ninventory transfer.",
-            "maxLength": 100,
-            "nullable": true
-          }
-        }
       },
       "Invoice": {
         "type": "object",
@@ -31137,7 +31759,7 @@
           },
           "track_inventory": {
             "type": "boolean",
-            "description": "If `true`, inventory tracking is active for the `CatalogItemVariation` at this `Location`.",
+            "description": "Indicates whether inventory tracking is active for the `CatalogItemVariation` at this `Location`.\nWhen set, this value explicitly overrides the global `track_inventory` setting. When unset, the location\nshould use the global value. If both global and location-level values are unset, inventory tracking is disabled.",
             "nullable": true
           },
           "inventory_alert_type": {
@@ -32459,6 +33081,18 @@
           }
         }
       },
+      "LightningDetails": {
+        "type": "object",
+        "description": "Additional details about `WALLET` type payments with the `brand` of `LIGHTNING`.",
+        "x-release-status": "PUBLIC",
+        "properties": {
+          "payment_url": {
+            "type": "string",
+            "description": "Payment URL for the lightning payment, a.k.a. the invoice.",
+            "nullable": true
+          }
+        }
+      },
       "LinkCustomerToGiftCardRequest": {
         "type": "object",
         "description": "A request to link a customer to a gift card.",
@@ -32519,13 +33153,6 @@
         "description": "Response object returned by ListBankAccounts.",
         "x-release-status": "PUBLIC",
         "properties": {
-          "errors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "description": "Information on errors encountered during the request."
-          },
           "bank_accounts": {
             "type": "array",
             "items": {
@@ -32533,42 +33160,51 @@
             },
             "description": "List of BankAccounts associated with this account."
           },
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Information on errors encountered during the request."
+          },
           "cursor": {
             "type": "string",
-            "description": "When a response is truncated, it includes a cursor that you can \nuse in a subsequent request to fetch next set of bank accounts.\nIf empty, this is the final response.\n\nFor more information, see [Pagination](https://developer.squareup.com/docs/working-with-apis/pagination)."
+            "description": "When a response is truncated, it includes a cursor that you can\nuse in a subsequent request to fetch next set of bank accounts.\nIf empty, this is the final response.\n\nFor more information, see [Pagination](https://developer.squareup.com/docs/working-with-apis/pagination)."
           }
         },
         "example": {
           "bank_accounts": [
             {
-              "account_number_suffix": "971",
+              "account_number_suffix": "000",
               "account_type": "CHECKING",
-              "bank_name": "Bank Name",
+              "bank_name": "Citizens Bank",
               "country": "US",
-              "creditable": false,
+              "creditable": true,
               "currency": "USD",
-              "debitable": false,
-              "holder_name": "Jane Doe",
-              "id": "ao6iaQ9vhDiaQD7n3GB",
-              "location_id": "S8GWD5example",
-              "primary_bank_identification_number": "112200303",
-              "status": "VERIFICATION_IN_PROGRESS",
-              "version": 5
+              "customer_id": "HM3B2D5JKGZ69359BTEHXM2V8M",
+              "debitable": true,
+              "fingerprint": "sq-1-mO3XNctJpTLL8uYowOWpioS8nQyTc838gcBo90254XonoEJ_c7Uw6yqL6qihFNY8fA",
+              "holder_name": "Nicola Snow",
+              "id": "bact:OxfBTiXgByaXds1K4GB",
+              "primary_bank_identification_number": "011401533",
+              "status": "VERIFIED",
+              "version": 2
             },
             {
-              "account_number_suffix": "972",
+              "account_number_suffix": "118",
               "account_type": "CHECKING",
-              "bank_name": "Bank Name",
+              "bank_name": "Bank of America",
               "country": "US",
-              "creditable": false,
+              "creditable": true,
               "currency": "USD",
-              "debitable": false,
-              "holder_name": "Jane Doe",
-              "id": "4x7WXuaxrkQkVlka3GB",
-              "location_id": "S8GWD5example",
-              "primary_bank_identification_number": "112200303",
-              "status": "VERIFICATION_IN_PROGRESS",
-              "version": 5
+              "customer_id": "HM3B2D5JKGZ69359BTEHXM2V8M",
+              "debitable": true,
+              "fingerprint": "sq-1-Poacr0bohmds1N--OseZUsG5kPwfCGxqYKlb-Q1Rxwsk0lxd1JLs4yaPDuMqIae7Qg",
+              "holder_name": "Nicola Snow",
+              "id": "bact:Msdfa2kgUDR9lMgk4GB",
+              "primary_bank_identification_number": "100210004",
+              "status": "DISABLED",
+              "version": 3
             }
           ]
         }
@@ -33916,6 +34552,55 @@
               "type": "DIGITAL"
             }
           ]
+        }
+      },
+      "ListInventoryAdjustmentReasonsResponse": {
+        "type": "object",
+        "description": "Represents an output from a call to [ListInventoryAdjustmentReasons](api-endpoint:Inventory-ListInventoryAdjustmentReasons).",
+        "x-release-status": "BETA",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Errors encountered when the request fails."
+          },
+          "adjustment_reasons": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InventoryAdjustmentReason"
+            },
+            "description": "The standard, system-generated, and custom inventory adjustment\nreasons available to the seller."
+          }
+        },
+        "example": {
+          "adjustment_reasons": [
+            {
+              "direction": "INCREASE",
+              "id": {
+                "type": "RECEIVED"
+              }
+            },
+            {
+              "direction": "DECREASE",
+              "id": {
+                "type": "DAMAGED"
+              }
+            },
+            {
+              "created_at": "2026-07-15T18:24:31.000Z",
+              "direction": "DECREASE",
+              "id": {
+                "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+                "type": "CUSTOM"
+              },
+              "is_deleted": false,
+              "name": "Donated to charity",
+              "updated_at": "2026-07-15T18:24:31.000Z"
+            }
+          ],
+          "errors": []
         }
       },
       "ListInvoicesResponse": {
@@ -40303,6 +40988,11 @@
             "type": "string",
             "description": "The secret your application generated for the authorization request used to\nobtain the authorization code. This is the source of the `code_challenge` hash you\nprovided in your authorization URL.\n\nRequired for the PKCE flow if `grant_type` is `authorization_code`.",
             "nullable": true
+          },
+          "use_jwt": {
+            "type": "boolean",
+            "description": "Indicates whether to use a JWT (JSON Web Token) as the OAuth access token.\nWhen set to `true`, the OAuth flow returns a JWT to your application, used in the\nsame way as a regular token. The default value is `false`.",
+            "nullable": true
           }
         },
         "example": {
@@ -40442,7 +41132,7 @@
           },
           "source": {
             "$ref": "#/components/schemas/OrderSource",
-            "description": "The origination details of the order.",
+            "description": "The latest source details of the order.\n\nThis field reflects the most recent source that interacted with or modified the order,\nand may change during the order lifecycle. For example:\n- An order created via API (source.name = \"MyPOS\") paid with Square Terminal may have\nsource updated to reflect the Terminal application (which uses REGISTER, like POS)\n- An order updated or completed by a different application may have source updated\nto reflect that application.\n\nTo preserve the original source from order creation regardless of subsequent updates,\nuse the `creation_source` field instead.",
             "nullable": true
           },
           "customer_id": {
@@ -40599,7 +41289,7 @@
           "ticket_name": {
             "type": "string",
             "description": "A short-term identifier for the order (such as a customer first name,\ntable number, or auto-generated order number that resets daily).",
-            "maxLength": 30,
+            "maxLength": 255,
             "x-release-status": "BETA",
             "nullable": true
           },
@@ -40623,6 +41313,25 @@
             "readOnly": true
           }
         }
+      },
+      "OrderCardSurchargeTreatmentType": {
+        "type": "string",
+        "enum": [
+          "LINE_ITEM_TREATMENT",
+          "APPORTIONED_TREATMENT"
+        ],
+        "x-enum-elements": [
+          {
+            "name": "LINE_ITEM_TREATMENT",
+            "description": ""
+          },
+          {
+            "name": "APPORTIONED_TREATMENT",
+            "description": ""
+          }
+        ],
+        "description": "Indicates whether the card surcharge will be treated as a value-holding line item or\napportioned across all line items.",
+        "x-release-status": "BETA"
       },
       "OrderCreated": {
         "type": "object",
@@ -41765,12 +42474,12 @@
           },
           "base_price_money": {
             "$ref": "#/components/schemas/Money",
-            "description": "The base price for a single unit of the line item.",
+            "description": "The base price for a single unit of the line item. Note - If inclusive tax is set on\nthis item it will be included in this value.",
             "nullable": true
           },
           "variation_total_price_money": {
             "$ref": "#/components/schemas/Money",
-            "description": "The total price of all item variations sold in this line item.\nThe price is calculated as `base_price_money` multiplied by `quantity`.\nIt does not include modifiers.",
+            "description": "The total price of all item variations sold in this line item.\nThe price is calculated as `base_price_money` multiplied by `quantity`.\nIt does not include modifiers. Note - If inclusive tax is set on\nthis item it will be included in this value.",
             "readOnly": true
           },
           "gross_sales_money": {
@@ -41883,6 +42592,11 @@
           "applied_money": {
             "$ref": "#/components/schemas/Money",
             "description": "The amount of money applied by the tax to the line item.",
+            "readOnly": true
+          },
+          "auto_applied": {
+            "type": "boolean",
+            "description": "Indicates whether the tax was automatically applied to the order based on\nthe catalog configuration. For an example, see\n[Automatically Apply Taxes to an Order](https://developer.squareup.com/docs/orders-api/apply-taxes-and-discounts/auto-apply-taxes).",
             "readOnly": true
           }
         }
@@ -42103,6 +42817,12 @@
             "description": "Application-defined data attached to this order. Metadata fields are intended\nto store descriptive references or associations with an entity in another system or store brief\ninformation about the object. Square does not process this field; it only stores and returns it\nin relevant API calls. Do not use metadata to store any sensitive information (such as personally\nidentifiable information or card details).\n\nKeys written by applications must be 60 characters or less and must be in the character set\n`[a-zA-Z0-9_-]`. Entries can also include metadata generated by Square. These keys are prefixed\nwith a namespace, separated from the key with a ':' character.\n\nValues have a maximum length of 255 characters.\n\nAn application can have up to 10 entries per metadata field.\n\nEntries written by applications are private and can only be read or modified by the same\napplication.\n\nFor more information, see  [Metadata](https://developer.squareup.com/docs/build-basics/metadata).",
             "x-release-status": "BETA",
             "nullable": true
+          },
+          "parent_modifier_uid": {
+            "type": "string",
+            "description": "The `uid` of the parent modifier, if this modifier is nested under another modifier.",
+            "maxLength": 60,
+            "nullable": true
           }
         }
       },
@@ -42125,6 +42845,14 @@
               "$ref": "#/components/schemas/OrderLineItemPricingBlocklistsBlockedTax"
             },
             "description": "A list of taxes blocked from applying to the line item.\nTaxes can be blocked by the `tax_uid` (for ad hoc taxes) or\nthe `tax_catalog_object_id` (for catalog taxes).",
+            "nullable": true
+          },
+          "blocked_service_charges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderLineItemPricingBlocklistsBlockedServiceCharge"
+            },
+            "description": "A list of service charges blocked from applying to the line item.\nService charges can be blocked by the `service_charge_uid` (for ad hoc\nservice charges) or the `service_charge_catalog_object_id` (for catalog\nservice charges).",
             "nullable": true
           }
         }
@@ -42149,6 +42877,31 @@
           "discount_catalog_object_id": {
             "type": "string",
             "description": "The `catalog_object_id` of the discount that should be blocked.\nUse this field to block catalog discounts. For ad hoc discounts, use the\n`discount_uid` field.",
+            "maxLength": 192,
+            "nullable": true
+          }
+        }
+      },
+      "OrderLineItemPricingBlocklistsBlockedServiceCharge": {
+        "type": "object",
+        "description": "A service charge to block from applying to a line item. The service charge\nmust be identified by either `service_charge_uid` or\n`service_charge_catalog_object_id`, but not both.",
+        "x-release-status": "BETA",
+        "properties": {
+          "uid": {
+            "type": "string",
+            "description": "A unique ID of the `BlockedServiceCharge` within the order.",
+            "maxLength": 60,
+            "nullable": true
+          },
+          "service_charge_uid": {
+            "type": "string",
+            "description": "The `uid` of the service charge that should be blocked. Use this field to\nblock ad hoc service charges. For catalog service charges, use the \n`service_charge_catalog_object_id` field.",
+            "maxLength": 60,
+            "nullable": true
+          },
+          "service_charge_catalog_object_id": {
+            "type": "string",
+            "description": "The `catalog_object_id` of the service charge that should be blocked.\nUse this field to block catalog service charges. For ad hoc service charges,\nuse the `service_charge_uid` field.",
             "maxLength": 192,
             "nullable": true
           }
@@ -42411,7 +43164,7 @@
               "$ref": "#/components/schemas/OrderReturnTax"
             },
             "description": "A collection of references to taxes being returned for an order, including the total\napplied tax amount to be returned. The taxes must reference a top-level tax ID from the source\norder.",
-            "readOnly": true
+            "nullable": true
           },
           "return_discounts": {
             "type": "array",
@@ -42419,7 +43172,7 @@
               "$ref": "#/components/schemas/OrderReturnDiscount"
             },
             "description": "A collection of references to discounts being returned for an order, including the total\napplied discount amount to be returned. The discounts must reference a top-level discount ID\nfrom the source order.",
-            "readOnly": true
+            "nullable": true
           },
           "return_tips": {
             "type": "array",
@@ -42774,7 +43527,7 @@
           },
           "treatment_type": {
             "$ref": "#/components/schemas/OrderServiceChargeTreatmentType",
-            "description": "The treatment type of the service charge.\nSee [OrderServiceChargeTreatmentType](#type-orderservicechargetreatmenttype) for possible values",
+            "description": "Indicates whether the service charge will be treated as a value-holding line item or apportioned toward a line item.\nSee [OrderServiceChargeTreatmentType](#type-orderservicechargetreatmenttype) for possible values",
             "x-release-status": "BETA",
             "nullable": true
           },
@@ -42783,6 +43536,11 @@
             "description": "Indicates the level at which the apportioned service charge applies. For `ORDER`\nscoped service charges, Square generates references in `applied_service_charges` on\nall order line items that do not have them. For `LINE_ITEM` scoped service charges,\nthe service charge only applies to line items with a service charge reference in their\n`applied_service_charges` field.\n\nThis field is immutable. To change the scope of an apportioned service charge, you must delete\nthe apportioned service charge and re-add it as a new apportioned service charge.\nSee [OrderServiceChargeScope](#type-orderservicechargescope) for possible values",
             "x-release-status": "BETA",
             "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/OrderServiceChargeType",
+            "description": "The type of the service charge.\nSee [OrderServiceChargeType](#type-orderservicechargetype) for possible values",
+            "readOnly": true
           }
         }
       },
@@ -42932,7 +43690,7 @@
           },
           "name": {
             "type": "string",
-            "description": "The name of the service charge.",
+            "description": "The name of the service charge. This is unused and null for AUTO_GRATUITY to match the behavior on Bills.",
             "maxLength": 512,
             "nullable": true
           },
@@ -43009,7 +43767,7 @@
           },
           "treatment_type": {
             "$ref": "#/components/schemas/OrderServiceChargeTreatmentType",
-            "description": "The treatment type of the service charge.\nSee [OrderServiceChargeTreatmentType](#type-orderservicechargetreatmenttype) for possible values",
+            "description": "Indicates whether the service charge will be treated as a value-holding line item or apportioned toward a line item.\nSee [OrderServiceChargeTreatmentType](#type-orderservicechargetreatmenttype) for possible values",
             "x-release-status": "BETA",
             "nullable": true
           },
@@ -43626,6 +44384,14 @@
             "description": "The amount the developer is taking as a fee for facilitating the payment on behalf\nof the seller. This amount is specified in the smallest denomination of the applicable currency\n(for example, US dollar amounts are specified in cents). For more information,\nsee [Take Payments and Collect Fees](https://developer.squareup.com/docs/payments-api/take-payments-and-collect-fees).\n\nThe amount cannot be more than 90% of the `total_money` value.\n\nTo set this field, `PAYMENTS_WRITE_ADDITIONAL_RECIPIENTS` OAuth permission is required.\nFor more information, see [Permissions](https://developer.squareup.com/docs/payments-api/take-payments-and-collect-fees#permissions).",
             "nullable": true
           },
+          "app_fee_allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppFeeAllocation"
+            },
+            "description": "Details pertaining to recipients of the application fee.",
+            "nullable": true
+          },
           "approved_money": {
             "$ref": "#/components/schemas/Money",
             "description": "The amount of money approved for this payment. This value may change if Square chooses to\nobtain reauthorization as part of a call to [UpdatePayment](api-endpoint:Payments-UpdatePayment).",
@@ -43685,6 +44451,12 @@
             "$ref": "#/components/schemas/BankAccountPaymentDetails",
             "description": "Details about a bank account payment. These details are only populated if the source_type is `BANK_ACCOUNT`.",
             "readOnly": true
+          },
+          "electronic_money_details": {
+            "$ref": "#/components/schemas/ElectronicMoneyDetails",
+            "description": "Details specific to electronic money payments.",
+            "x-release-status": "BETA",
+            "nullable": true
           },
           "external_details": {
             "$ref": "#/components/schemas/ExternalPaymentDetails",
@@ -43818,6 +44590,11 @@
           "application_details": {
             "$ref": "#/components/schemas/ApplicationDetails",
             "description": "Details about the application that took the payment.",
+            "readOnly": true
+          },
+          "buyer_currency_exchange": {
+            "$ref": "#/components/schemas/CurrencyExchange",
+            "description": "Details about the currency exchange for payments where the currency the buyer\npaid with differs from the currency the merchant received (e.g., bitcoin lightning payments).\n\nThis field will only be present when the buyer paid in a different currency than\nthe one used in the payment's total_money/amount_money fields.",
             "readOnly": true
           },
           "is_offline_payment": {
@@ -44487,6 +45264,14 @@
             "$ref": "#/components/schemas/Money",
             "description": "The amount of money the application developer contributed to help cover the refunded amount.\nThis amount is specified in the smallest denomination of the applicable currency (for example,\nUS dollar amounts are specified in cents). For more information, see\n[Working with Monetary Amounts](https://developer.squareup.com/docs/build-basics/working-with-monetary-amounts).",
             "nullable": true
+          },
+          "app_fee_allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppFeeAllocation"
+            },
+            "description": "Details pertaining to contributors to the refund of the application fee.",
+            "readOnly": true
           },
           "processing_fee": {
             "type": "array",
@@ -45811,12 +46596,12 @@
                 "quantity_canceled": "1",
                 "quantity_damaged": "1",
                 "quantity_received": "3",
-                "uid": "1"
+                "transfer_order_line_uid": "1"
               },
               {
                 "quantity_canceled": "1",
                 "quantity_received": "2",
-                "uid": "2"
+                "transfer_order_line_uid": "2"
               }
             ]
           },
@@ -46228,6 +47013,14 @@
             "x-release-status": "BETA",
             "nullable": true
           },
+          "app_fee_allocations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppFeeAllocation"
+            },
+            "description": "Details pertaining to contributors to the refund of the application fee.\nThe sum of the amounts in the app_fee_allocations must equal the app_fee_money amount, if\npresent. If populated, an allocation must be present for every party that expects to contribute\na portion of the refunded application fee, including the application developer.",
+            "nullable": true
+          },
           "payment_id": {
             "type": "string",
             "description": "The unique ID of the payment being refunded.\nRequired when unlinked=false, otherwise must not be set.",
@@ -46562,6 +47355,58 @@
           }
         },
         "example": {}
+      },
+      "RestoreInventoryAdjustmentReasonRequest": {
+        "type": "object",
+        "description": "Represents an input to a call to [RestoreInventoryAdjustmentReason](api-endpoint:Inventory-RestoreInventoryAdjustmentReason).",
+        "x-release-status": "BETA",
+        "required": [
+          "reason_id"
+        ],
+        "properties": {
+          "reason_id": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReasonId",
+            "description": "The identifier of the soft-deleted custom inventory adjustment reason\nto restore."
+          }
+        },
+        "example": {
+          "reason_id": {
+            "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+            "type": "CUSTOM"
+          }
+        }
+      },
+      "RestoreInventoryAdjustmentReasonResponse": {
+        "type": "object",
+        "description": "Represents an output from a call to [RestoreInventoryAdjustmentReason](api-endpoint:Inventory-RestoreInventoryAdjustmentReason).",
+        "x-release-status": "BETA",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Errors encountered when the request fails."
+          },
+          "adjustment_reason": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReason",
+            "description": "The successfully restored inventory adjustment reason."
+          }
+        },
+        "example": {
+          "adjustment_reason": {
+            "created_at": "2026-07-15T18:24:31.000Z",
+            "direction": "DECREASE",
+            "id": {
+              "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+              "type": "CUSTOM"
+            },
+            "is_deleted": false,
+            "name": "Charitable donation",
+            "updated_at": "2026-07-15T19:07:12.000Z"
+          },
+          "errors": []
+        }
       },
       "ResumeSubscriptionRequest": {
         "type": "object",
@@ -47416,6 +48261,58 @@
           }
         }
       },
+      "RetrieveInventoryAdjustmentReasonRequest": {
+        "type": "object",
+        "description": "Represents an input to a call to [RetrieveInventoryAdjustmentReason](api-endpoint:Inventory-RetrieveInventoryAdjustmentReason).",
+        "x-release-status": "BETA",
+        "required": [
+          "reason_id"
+        ],
+        "properties": {
+          "reason_id": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReasonId",
+            "description": "The identifier of the inventory adjustment reason to retrieve."
+          }
+        },
+        "example": {
+          "reason_id": {
+            "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+            "type": "CUSTOM"
+          }
+        }
+      },
+      "RetrieveInventoryAdjustmentReasonResponse": {
+        "type": "object",
+        "description": "Represents an output from a call to [RetrieveInventoryAdjustmentReason](api-endpoint:Inventory-RetrieveInventoryAdjustmentReason).",
+        "x-release-status": "BETA",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Errors encountered when the request fails."
+          },
+          "adjustment_reason": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReason",
+            "description": "The successfully retrieved inventory adjustment reason. Deleted custom\nreasons can be retrieved by ID and have `is_deleted` set to `true`."
+          }
+        },
+        "example": {
+          "adjustment_reason": {
+            "created_at": "2026-07-15T18:24:31.000Z",
+            "direction": "DECREASE",
+            "id": {
+              "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+              "type": "CUSTOM"
+            },
+            "is_deleted": false,
+            "name": "Donated to charity",
+            "updated_at": "2026-07-15T18:24:31.000Z"
+          },
+          "errors": []
+        }
+      },
       "RetrieveInventoryAdjustmentResponse": {
         "type": "object",
         "x-release-status": "PUBLIC",
@@ -47585,44 +48482,6 @@
             "team_member_id": "LRK57NSQ5X7PUD05"
           },
           "errors": []
-        }
-      },
-      "RetrieveInventoryTransferResponse": {
-        "type": "object",
-        "x-release-status": "BETA",
-        "properties": {
-          "errors": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Error"
-            },
-            "description": "Any errors that occurred during the request."
-          },
-          "transfer": {
-            "$ref": "#/components/schemas/InventoryTransfer",
-            "description": "The requested [InventoryTransfer](entity:InventoryTransfer)."
-          }
-        },
-        "example": {
-          "errors": [],
-          "transfer": {
-            "catalog_object_id": "W62UWFY35CWMYGVWK6TWJDNI",
-            "catalog_object_type": "ITEM_VARIATION",
-            "created_at": "2016-11-17T13:02:15.142Z",
-            "from_location_id": "C6W5YS5QM06F5",
-            "id": "UDMOEO78BG6GYWA2XDRYX3KB",
-            "occurred_at": "2016-11-16T25:44:22.837Z",
-            "quantity": "7",
-            "reference_id": "4a366069-4096-47a2-99a5-0084ac879509",
-            "source": {
-              "application_id": "416ff29c-86c4-4feb-b58c-9705f21f3ea0",
-              "name": "Square Point of Sale 4.37",
-              "product": "SQUARE_POS"
-            },
-            "state": "IN_STOCK",
-            "team_member_id": "LRK57NSQ5X7PUD05",
-            "to_location_id": "59TNP9SA8VGDA"
-          }
         }
       },
       "RetrieveJobResponse": {
@@ -57194,6 +58053,39 @@
             "nullable": true
           }
         },
+        "example": {
+          "created_at": "2025-12-11T19:46:04.617Z",
+          "data": {
+            "id": "DKFUE94JS8H14",
+            "object": {
+              "transfer_order": {
+                "created_at": "2025-12-11T19:46:04.617Z",
+                "created_by_team_member_id": "SJFe94qu73J",
+                "destination_location_id": "Q85PI2QS5BZQGH",
+                "id": "DKFUE94JS8H14",
+                "line_items": [
+                  {
+                    "item_variation_id": "DJF38FJSSIDO38JEWNXLOGUEYWW",
+                    "quantity_canceled": "0",
+                    "quantity_damaged": "0",
+                    "quantity_ordered": "3",
+                    "quantity_pending": "3",
+                    "quantity_received": "0",
+                    "uid": "CPWUT73UXJ39LP"
+                  }
+                ],
+                "source_location_id": "SKS93J2008Z6A",
+                "status": "DRAFT",
+                "updated_at": "2025-12-11T19:46:04.617Z",
+                "version": 1765482364617
+              }
+            },
+            "type": "transfer_order"
+          },
+          "event_id": "116038d3-2939-439f-8679-fc86dbf80f69",
+          "merchant_id": "5S9MXCS9Y99KK",
+          "type": "transfer_order.created"
+        },
         "x-webhook": {
           "event": "transfer_order.created",
           "scopes": [
@@ -57201,7 +58093,8 @@
             "INVENTORY_WRITE"
           ]
         },
-        "x-api": "#/components/x-apis/TransferOrder"
+        "x-api": "#/components/x-apis/TransferOrder",
+        "x-since": "2025-10-16"
       },
       "TransferOrderCreatedEventData": {
         "type": "object",
@@ -57267,13 +58160,25 @@
             "nullable": true
           }
         },
+        "example": {
+          "created_at": "2025-12-11T20:00:00.000Z",
+          "data": {
+            "deleted": true,
+            "id": "DKFUE94JS8H14",
+            "type": "transfer_order"
+          },
+          "event_id": "303so93-2948-439f-8679-fc86dbf80f71",
+          "merchant_id": "5S9MXCS9Y99KK",
+          "type": "transfer_order.deleted"
+        },
         "x-webhook": {
           "event": "transfer_order.deleted",
           "scopes": [
             "INVENTORY_WRITE"
           ]
         },
-        "x-api": "#/components/x-apis/TransferOrder"
+        "x-api": "#/components/x-apis/TransferOrder",
+        "x-since": "2025-10-16"
       },
       "TransferOrderDeletedEventData": {
         "type": "object",
@@ -57549,6 +58454,39 @@
             "nullable": true
           }
         },
+        "example": {
+          "created_at": "2025-12-11T19:50:12.845Z",
+          "data": {
+            "id": "DKFUE94JS8H14",
+            "object": {
+              "transfer_order": {
+                "created_at": "2025-12-11T19:46:04.617Z",
+                "created_by_team_member_id": "SJFe94qu73J",
+                "destination_location_id": "Q85PI2QS5BZQGH",
+                "id": "DKFUE94JS8H14",
+                "line_items": [
+                  {
+                    "item_variation_id": "DJF38FJSSIDO38JEWNXLOGUEYWW",
+                    "quantity_canceled": "0",
+                    "quantity_damaged": "0",
+                    "quantity_ordered": "5",
+                    "quantity_pending": "5",
+                    "quantity_received": "0",
+                    "uid": "CPWUT73UXJ39LP"
+                  }
+                ],
+                "source_location_id": "SKS93J2008Z6A",
+                "status": "PENDING",
+                "updated_at": "2025-12-11T19:50:12.845Z",
+                "version": 1765482612845
+              }
+            },
+            "type": "transfer_order"
+          },
+          "event_id": "333oleuu-2948-439f-8679-fc86dbf80f70",
+          "merchant_id": "5S9MXCS9Y99KK",
+          "type": "transfer_order.updated"
+        },
         "x-webhook": {
           "event": "transfer_order.updated",
           "scopes": [
@@ -57556,7 +58494,8 @@
             "INVENTORY_WRITE"
           ]
         },
-        "x-api": "#/components/x-apis/TransferOrder"
+        "x-api": "#/components/x-apis/TransferOrder",
+        "x-since": "2025-10-16"
       },
       "TransferOrderUpdatedEventData": {
         "type": "object",
@@ -58104,6 +59043,147 @@
           "php": "/sdk_samples/UpdateCustomer/UpdateCustomerResponse.php",
           "python": "/sdk_samples/UpdateCustomer/UpdateCustomerResponse.python",
           "ruby": "/sdk_samples/UpdateCustomer/UpdateCustomerResponse.ruby"
+        }
+      },
+      "UpdateInventoryAdjustmentReasonRequest": {
+        "type": "object",
+        "description": "Represents an input to a call to [UpdateInventoryAdjustmentReason](api-endpoint:Inventory-UpdateInventoryAdjustmentReason).",
+        "x-release-status": "BETA",
+        "required": [
+          "reason_id",
+          "adjustment_reason"
+        ],
+        "properties": {
+          "reason_id": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReasonId",
+            "description": "The identifier of the custom inventory adjustment reason to update."
+          },
+          "adjustment_reason": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReason",
+            "description": "The requested custom inventory adjustment reason update. Only the\n`name` field can be updated. Deleted custom reasons cannot be updated. To\nrestore a deleted custom reason, call\n[RestoreInventoryAdjustmentReason](api-endpoint:Inventory-RestoreInventoryAdjustmentReason)."
+          }
+        },
+        "example": {
+          "adjustment_reason": {
+            "id": {
+              "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+              "type": "CUSTOM"
+            },
+            "name": "Charitable donation"
+          },
+          "reason_id": {
+            "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+            "type": "CUSTOM"
+          }
+        }
+      },
+      "UpdateInventoryAdjustmentReasonResponse": {
+        "type": "object",
+        "description": "Represents an output from a call to [UpdateInventoryAdjustmentReason](api-endpoint:Inventory-UpdateInventoryAdjustmentReason).",
+        "x-release-status": "BETA",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Errors encountered when the request fails."
+          },
+          "adjustment_reason": {
+            "$ref": "#/components/schemas/InventoryAdjustmentReason",
+            "description": "The successfully updated inventory adjustment reason."
+          }
+        },
+        "example": {
+          "adjustment_reason": {
+            "created_at": "2026-07-15T18:24:31.000Z",
+            "direction": "DECREASE",
+            "id": {
+              "custom_reason_id": "R5BX3PDCZ6EXAMPLE",
+              "type": "CUSTOM"
+            },
+            "is_deleted": false,
+            "name": "Charitable donation",
+            "updated_at": "2026-07-15T19:02:07.000Z"
+          },
+          "errors": []
+        }
+      },
+      "UpdateInventoryAdjustmentRequest": {
+        "type": "object",
+        "x-release-status": "BETA",
+        "required": [
+          "idempotency_key",
+          "adjustment"
+        ],
+        "properties": {
+          "idempotency_key": {
+            "type": "string",
+            "description": "A client-supplied, universally unique identifier (UUID) for the\nrequest.\n\nSee [Idempotency](https://developer.squareup.com/docs/build-basics/common-api-patterns/idempotency) in the\n[Build Basics](https://developer.squareup.com/docs/buildbasics) section for more\ninformation.",
+            "minLength": 1,
+            "maxLength": 128
+          },
+          "adjustment": {
+            "$ref": "#/components/schemas/InventoryAdjustment",
+            "description": "Represents the updates being written to a past/existing inventory adjustment.\nThis works using sparse updates, meaning that any fields omitted from the inputted InventoryAdjustment\nwill retain their values.\n\nOnly updates to the quantity, cost_money, vendor_id, and reason_id fields of an InventoryAdjustment can be made here.\nNote that the quantity field must be provided, but it can be identical to the current quantity if there are no desired quantity changes.\ncost_money and vendor_id can only be written to adjustments that add stock to the system (from_state of NONE or UNLINKED_RETURN) and to untracked sale adjustments.\nreason_id can be changed to any reason that is valid for the adjustment's state transition. The reason of a system-generated adjustment (for example, SALE or RECOUNT) cannot be changed.\nAdjustments generated by Square from other records cannot be updated. This includes inferred adjustments created by physical counts, transfer-like cross-location adjustments, and component adjustments.\nAdjustments linked to purchase orders cannot be updated. Adjustments linked to sales can only have cost_money and vendor_id updated, and only for untracked sales.\nRestock adjustments linked to an itemized return can have their quantity updated, up to the quantity remaining on the return.\nAdjustments older than one year cannot be updated."
+          }
+        },
+        "example": {
+          "idempotency_key": "8fc6a5b0-9fe8-4b46-b46b-2ef95793abbe",
+          "update": {
+            "adjustment_id": "UDMOEO78BG6GYWA2XDRYX3KB",
+            "quantity": "7.5"
+          }
+        },
+        "x-sq-sdk-sample-code": {
+          "csharp": "/sdk_samples/Inventory/UpdateInventoryAdjustment/UpdateInventoryAdjustmentRequest.csharp",
+          "java": "/sdk_samples/Inventory/UpdateInventoryAdjustment/UpdateInventoryAdjustmentRequest.java",
+          "javascript": "/sdk_samples/Inventory/UpdateInventoryAdjustment/UpdateInventoryAdjustmentRequest.javascript",
+          "php": "/sdk_samples/Inventory/UpdateInventoryAdjustment/UpdateInventoryAdjustmentRequest.php",
+          "python": "/sdk_samples/Inventory/UpdateInventoryAdjustment/UpdateInventoryAdjustmentRequest.python",
+          "ruby": "/sdk_samples/Inventory/UpdateInventoryAdjustment/UpdateInventoryAdjustmentRequest.ruby"
+        }
+      },
+      "UpdateInventoryAdjustmentResponse": {
+        "type": "object",
+        "x-release-status": "BETA",
+        "properties": {
+          "errors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Error"
+            },
+            "description": "Any errors that occurred during the request."
+          },
+          "adjustment": {
+            "$ref": "#/components/schemas/InventoryAdjustment",
+            "description": "The newly updated adjustment."
+          }
+        },
+        "example": {
+          "adjustment": {
+            "catalog_object_id": "W62UWFY35CWMYGVWK6TWJDNI",
+            "catalog_object_type": "ITEM_VARIATION",
+            "created_at": "2016-11-17T13:02:15.142Z",
+            "from_state": "IN_STOCK",
+            "id": "UDMOEO78BG6GYWA2XDRYX3KB",
+            "location_id": "C6W5YS5QM06F5",
+            "occurred_at": "2016-11-16T25:44:22.837Z",
+            "quantity": "7.5",
+            "reference_id": "4a366069-4096-47a2-99a5-0084ac879509",
+            "source": {
+              "application_id": "416ff29c-86c4-4feb-b58c-9705f21f3ea0",
+              "name": "Square Point of Sale 4.37",
+              "product": "SQUARE_POS"
+            },
+            "team_member_id": "LRK57NSQ5X7PUD05",
+            "to_state": "SOLD",
+            "total_price_money": {
+              "amount": 4550,
+              "currency": "USD"
+            }
+          },
+          "errors": []
         }
       },
       "UpdateInvoiceRequest": {
@@ -61934,11 +63014,6 @@
         "summary": "Retrieve information about an organization that sells with Square.",
         "description": "\nThe Merchants API groups individual seller locations into larger organizations, allowing them to operate as a single entity. Each merchant represents one organization or business that sells with Square. Use this API to retrieve core information about the organization connecting to your application such as the merchant ID, language preferences, country, account status, and the name of the overall business.\n\nFor more information, see the following guide:\n - [Merchants](https://developer.squareup.com/docs/merchants-api)"
       },
-      "MobileAuthorization": {
-        "name": "Mobile Authorization",
-        "summary": "Authorize Reader SDK applications to take in-person payments.",
-        "description": "\n**Deprecated** - Developers should update their Reader SDK integration to use the \n[Mobile Payments SDK](https://developer.squareup.com/docs/mobile-payments-sdk), which includes its own authorization methods. \n\nThe Mobile Authorization API accepts an account credential (an OAuth token or a personal access token) and a\nlocation ID and returns an authorization code that custom mobile applications can use to initialize Square mobile\nsolutions, like Reader SDK, to accept payments using Square hardware.\n\nFor more information, see the following guide:\n - [Mobile Authorization](https://developer.squareup.com/docs/mobile-authz/what-it-does)"
-      },
       "OAuth": {
         "name": "OAuth",
         "summary": "Allow your application to gain programmatic access to Square seller accounts.",
@@ -61971,8 +63046,8 @@
       },
       "Reporting": {
         "name": "Reporting",
-        "summary": "Deprecated - Use the Orders and Payments APIs instead.",
-        "description": "\nPrior to 2019/08/15, the Reporting API was the way to review multi-party payments taken with the Transactions\nAPI. The Payments API now includes an \"application fee\" parameter you can use to replace this functionality."
+        "summary": "Use the Square Reporting API to generate complex reports from a single data surface.",
+        "description": "\nThe Square Reporting API lets you generate complex reports from one consistent data surface,\nwithout stitching together multiple API calls. Use it to recreate the reports you already rely\non, build entirely new ones, and access data you couldn't get before.\n\nTo get started:\n\n- **Overview and guides:** https://developer.squareup.com/docs/reporting-api/overview\n- **Schema explorer:** https://reporting-schema-explorer-production-f.squarecdn.com/index.html\n\nThe legacy Reporting API has been retired. Prior to 2019/08/15, it was the way to review\nmulti-party payments taken with the Transactions API; that functionality is now covered by the\n\"application fee\" parameter in the Payments API.\n"
       },
       "Sites": {
         "name": "Sites",
@@ -62042,8 +63117,7 @@
           "#/components/x-apis/Channels",
           "#/components/x-apis/Sites",
           "#/components/x-apis/Snippets",
-          "#/components/x-apis/Cash Drawers",
-          "#/components/x-apis/channels"
+          "#/components/x-apis/Cash Drawers"
         ]
       },
       "Customers": {
@@ -62096,7 +63170,6 @@
           "#/components/x-apis/Subscriptions",
           "#/components/x-apis/BankAccounts",
           "#/components/x-apis/Payouts",
-          "#/components/x-apis/MobileAuthorization",
           "#/components/x-apis/Devices",
           "#/components/x-apis/ApplePay"
         ]
@@ -62202,50 +63275,6 @@
     }
   },
   "paths": {
-    "/mobile/authorization-code": {
-      "post": {
-        "tags": [
-          "MobileAuthorization"
-        ],
-        "summary": "CreateMobileAuthorizationCode",
-        "operationId": "CreateMobileAuthorizationCode",
-        "description": "__Note:__ This endpoint is used by the deprecated Reader SDK. \nDevelopers should update their integration to use the [Mobile Payments SDK](https://developer.squareup.com/docs/mobile-payments-sdk), which includes its own authorization methods. \n\nGenerates code to authorize a mobile application to connect to a Square card reader.\n\nAuthorization codes are one-time-use codes and expire 60 minutes after being issued.\n\nThe `Authorization` header you provide to this endpoint must have the following format:\n\n```\nAuthorization: Bearer ACCESS_TOKEN\n```\n\nReplace `ACCESS_TOKEN` with a\n[valid production authorization credential](https://developer.squareup.com/docs/build-basics/access-tokens).",
-        "x-release-status": "DEPRECATED",
-        "deprecated": true,
-        "x-deprecation": {},
-        "security": [
-          {
-            "oauth2": [
-              "PAYMENTS_WRITE_IN_PERSON"
-            ]
-          }
-        ],
-        "parameters": [],
-        "requestBody": {
-          "required": true,
-          "description": "An object containing the fields to POST for the request.\n\nSee the corresponding object definition for field details.",
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateMobileAuthorizationCodeRequest"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CreateMobileAuthorizationCodeResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/oauth2/revoke": {
       "post": {
         "tags": [
@@ -62599,7 +63628,7 @@
         "parameters": [
           {
             "name": "cursor",
-            "description": "The pagination cursor returned by a previous call to this endpoint.\nUse it in the next `ListBankAccounts` request to retrieve the next set \nof results.\n\nSee the [Pagination](https://developer.squareup.com/docs/working-with-apis/pagination) guide for more information.",
+            "description": "The pagination cursor returned by a previous call to this endpoint.\nUse it in the next `ListBankAccounts` request to retrieve the next set\nof results.\n\nSee the [Pagination](https://developer.squareup.com/docs/working-with-apis/pagination) guide for more information.",
             "schema": {
               "type": "string"
             },
@@ -62608,7 +63637,7 @@
           },
           {
             "name": "limit",
-            "description": "Upper limit on the number of bank accounts to return in the response. \nCurrently, 1000 is the largest supported limit. You can specify a limit \nof up to 1000 bank accounts. This is also the default limit.",
+            "description": "Upper limit on the number of bank accounts to return in the response.\nCurrently, 1000 is the largest supported limit. You can specify a limit\nof up to 1000 bank accounts. This is also the default limit.",
             "schema": {
               "type": "integer"
             },
@@ -62617,7 +63646,16 @@
           },
           {
             "name": "location_id",
-            "description": "Location ID. You can specify this optional filter \nto retrieve only the linked bank accounts belonging to a specific location.",
+            "description": "Location ID. You can specify this optional filter\nto retrieve only the linked bank accounts belonging to a specific location.",
+            "schema": {
+              "type": "string"
+            },
+            "in": "query",
+            "required": false
+          },
+          {
+            "name": "customer_id",
+            "description": "Customer ID. You can specify this optional filter\nto retrieve only the linked bank accounts belonging to a specific customer.",
             "schema": {
               "type": "string"
             },
@@ -62636,7 +63674,66 @@
               }
             }
           }
-        }
+        },
+        "x-endpoint-errors": [
+          {
+            "error-code": "INTERNAL_SERVER_ERROR"
+          },
+          {
+            "error-code": "BAD_REQUEST"
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "BankAccounts"
+        ],
+        "summary": "CreateBankAccount",
+        "operationId": "CreateBankAccount",
+        "description": "Store a bank account on file for a square account",
+        "x-release-status": "BETA",
+        "security": [
+          {
+            "oauth2": [
+              "BANK_ACCOUNTS_WRITE"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "An object containing the fields to POST for the request.\n\nSee the corresponding object definition for field details.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBankAccountRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateBankAccountResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-endpoint-errors": [
+          {
+            "error-code": "UNAUTHORIZED"
+          },
+          {
+            "error-code": "BAD_REQUEST"
+          },
+          {
+            "error-code": "NOT_FOUND"
+          }
+        ]
       }
     },
     "/v2/bank-accounts/by-v1-id/{v1_bank_account_id}": {
@@ -62687,7 +63784,7 @@
         ],
         "summary": "GetBankAccount",
         "operationId": "GetBankAccount",
-        "description": "Returns details of a [BankAccount](entity:BankAccount)\nlinked to a Square account.",
+        "description": "Retrieve details of a [BankAccount](entity:BankAccount) bank account linked to a Square account.",
         "x-release-status": "PUBLIC",
         "security": [
           {
@@ -62718,7 +63815,70 @@
               }
             }
           }
-        }
+        },
+        "x-endpoint-errors": [
+          {
+            "error-code": "INTERNAL_SERVER_ERROR"
+          },
+          {
+            "error-code": "BAD_REQUEST"
+          },
+          {
+            "error-code": "NOT_FOUND"
+          }
+        ]
+      }
+    },
+    "/v2/bank-accounts/{bank_account_id}/disable": {
+      "post": {
+        "tags": [
+          "BankAccounts"
+        ],
+        "summary": "DisableBankAccount",
+        "operationId": "DisableBankAccount",
+        "description": "Disable a bank account.",
+        "x-release-status": "BETA",
+        "security": [
+          {
+            "oauth2": [
+              "BANK_ACCOUNTS_WRITE"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "bank_account_id",
+            "description": "The ID of the bank account to disable.",
+            "schema": {
+              "type": "string"
+            },
+            "in": "path",
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DisableBankAccountResponse"
+                }
+              }
+            }
+          }
+        },
+        "x-endpoint-errors": [
+          {
+            "error-code": "UNAUTHORIZED"
+          },
+          {
+            "error-code": "BAD_REQUEST"
+          },
+          {
+            "error-code": "NOT_FOUND"
+          }
+        ]
       }
     },
     "/v2/bookings": {
@@ -64432,7 +65592,7 @@
         ],
         "summary": "BatchUpsertCatalogObjects",
         "operationId": "BatchUpsertCatalogObjects",
-        "description": "Creates or updates up to 10,000 target objects based on the provided\nlist of objects. The target objects are grouped into batches and each batch is\ninserted/updated in an all-or-nothing manner. If an object within a batch is\nmalformed in some way, or violates a database constraint, the entire batch\ncontaining that item will be disregarded. However, other batches in the same\nrequest may still succeed. Each batch may contain up to 1,000 objects, and\nbatches will be processed in order as long as the total object count for the\nrequest (items, variations, modifier lists, discounts, and taxes) is no more\nthan 10,000.\n\nTo ensure consistency, only one update request is processed at a time per seller account.\nWhile one (batch or non-batch) update request is being processed, other (batched and non-batched)\nupdate requests are rejected with the `429` error code.",
+        "description": "Creates or updates up to 10,000 target objects based on the provided\nlist of objects. The target objects are grouped into batches and each batch is\ninserted/updated in an all-or-nothing manner. If an object within a batch is\nmalformed in some way, or violates a database constraint, the entire batch\ncontaining that item will be disregarded. However, other batches in the same\nrequest may still succeed. Each batch may contain up to 1,000 objects, and\nbatches will be processed in order as long as the total object count for the\nrequest (items, variations, modifier lists, discounts, and taxes) is no more\nthan 10,000.\n\nThis endpoint uses full-replacement semantics. The client must send the complete object, and any\nfield absent from the request is interpreted as an intentional clear. This logic applies to\nnested objects as well. For example, omitting inlined children like variations will delete them.\n\nTo ensure consistency, only one update request is processed at a time per seller account.\nWhile one (batch or non-batch) update request is being processed, other (batched and non-batched)\nupdate requests are rejected with the `429` error code. Prefer batching related changes into a\nsingle call rather than issuing many small writes, since each write acquires the lock separately\nand parallel writes to the same seller will contend with each other, producing `429` errors.",
         "x-release-status": "PUBLIC",
         "security": [
           {
@@ -64643,7 +65803,7 @@
         ],
         "summary": "ListCatalog",
         "operationId": "ListCatalog",
-        "description": "Returns a list of all [CatalogObject](entity:CatalogObject)s of the specified types in the catalog.\n\nThe `types` parameter is specified as a comma-separated list of the [CatalogObjectType](entity:CatalogObjectType) values,\nfor example, \"`ITEM`, `ITEM_VARIATION`, `MODIFIER`, `MODIFIER_LIST`, `CATEGORY`, `DISCOUNT`, `TAX`, `IMAGE`\".\n\n__Important:__ ListCatalog does not return deleted catalog items. To retrieve\ndeleted catalog items, use [SearchCatalogObjects](api-endpoint:Catalog-SearchCatalogObjects)\nand set the `include_deleted_objects` attribute value to `true`.",
+        "description": "Returns a list of all [CatalogObject](entity:CatalogObject)s of the specified types in the catalog.\n\nThe `types` parameter is specified as a comma-separated list of the [CatalogObjectType](entity:CatalogObjectType) values,\nfor example, \"`ITEM`, `ITEM_VARIATION`, `MODIFIER`, `MODIFIER_LIST`, `CATEGORY`, `DISCOUNT`, `TAX`, `IMAGE`\".\nAlways specify `types` explicitly. When upgrading to a newer API version, omitting `types` may\ncause new object types to appear in results that were not returned under the previous version.\n\n__Important:__ ListCatalog does not return deleted catalog items. To retrieve\ndeleted catalog items, use [SearchCatalogObjects](api-endpoint:Catalog-SearchCatalogObjects)\nand set the `include_deleted_objects` attribute value to `true`.",
         "x-release-status": "PUBLIC",
         "security": [
           {
@@ -64703,7 +65863,7 @@
         ],
         "summary": "UpsertCatalogObject",
         "operationId": "UpsertCatalogObject",
-        "description": "Creates a new or updates the specified [CatalogObject](entity:CatalogObject).\n\nTo ensure consistency, only one update request is processed at a time per seller account.\nWhile one (batch or non-batch) update request is being processed, other (batched and non-batched)\nupdate requests are rejected with the `429` error code.",
+        "description": "Creates a new or updates the specified [CatalogObject](entity:CatalogObject).\n\nThis endpoint uses full-replacement semantics. The client must send the complete object, and any\nfield absent from the request is interpreted as an intentional clear. This logic applies to\nnested objects as well. For example, omitting inlined children like variations will delete them.\n\nTo ensure consistency, only one update request is processed at a time per seller account.\nWhile one (batch or non-batch) update request is being processed, other (batched and non-batched)\nupdate requests are rejected with the `429` error code.",
         "x-release-status": "PUBLIC",
         "security": [
           {
@@ -64863,7 +66023,7 @@
         ],
         "summary": "SearchCatalogObjects",
         "operationId": "SearchCatalogObjects",
-        "description": "Searches for [CatalogObject](entity:CatalogObject) of any type by matching supported search attribute values,\nexcluding custom attribute values on items or item variations, against one or more of the specified query filters.\n\nThis (`SearchCatalogObjects`) endpoint differs from the [SearchCatalogItems](api-endpoint:Catalog-SearchCatalogItems)\nendpoint in the following aspects:\n\n- `SearchCatalogItems` can only search for items or item variations, whereas `SearchCatalogObjects` can search for any type of catalog objects.\n- `SearchCatalogItems` supports the custom attribute query filters to return items or item variations that contain custom attribute values, where `SearchCatalogObjects` does not.\n- `SearchCatalogItems` does not support the `include_deleted_objects` filter to search for deleted items or item variations, whereas `SearchCatalogObjects` does.\n- The both endpoints have different call conventions, including the query filter formats.",
+        "description": "Searches for [CatalogObject](entity:CatalogObject) of any type by matching supported search attribute values,\nexcluding custom attribute values on items or item variations, against one or more of the specified query filters.\n\nThis (`SearchCatalogObjects`) endpoint differs from the [SearchCatalogItems](api-endpoint:Catalog-SearchCatalogItems)\nendpoint in the following aspects:\n\n- `SearchCatalogItems` can only search for items or item variations, whereas `SearchCatalogObjects` can search for any type of catalog objects.\n- `SearchCatalogItems` supports the custom attribute query filters to return items or item variations that contain custom attribute values, where `SearchCatalogObjects` does not.\n- `SearchCatalogItems` does not support the `include_deleted_objects` filter to search for deleted items or item variations, whereas `SearchCatalogObjects` does.\n- The both endpoints have different call conventions, including the query filter formats.\n\nThe `object_types` parameter is specified as a list of [CatalogObjectType](entity:CatalogObjectType) values.\nAlways specify `object_types` explicitly. When upgrading to a newer API version, omitting\n`object_types` may cause new object types to appear in results that were not returned under\nthe previous version.",
         "x-release-status": "PUBLIC",
         "security": [
           {
@@ -68319,6 +69479,268 @@
         }
       }
     },
+    "/v2/inventory/adjustment-reasons": {
+      "get": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "ListInventoryAdjustmentReasons",
+        "operationId": "ListInventoryAdjustmentReasons",
+        "description": "Returns the standard and custom inventory adjustment reasons available\nto the seller.",
+        "x-release-status": "BETA",
+        "security": [
+          {
+            "oauth2": [
+              "INVENTORY_READ"
+            ]
+          }
+        ],
+        "parameters": [
+          {
+            "name": "include_deleted",
+            "description": "Indicates whether the response should include deleted custom inventory\nadjustment reasons. The default value is `false`.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "in": "query",
+            "required": false
+          },
+          {
+            "name": "include_system_codes",
+            "description": "Indicates whether the response should include Square-generated system\ninventory adjustment reason codes that cannot be used to write adjustments\nfrom the Connect API, such as `SALE`, `RECOUNT`, `TRANSFER`, `IN_TRANSIT`,\nand `CANCELED_SALE`. The default value is `false`.",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            },
+            "in": "query",
+            "required": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ListInventoryAdjustmentReasonsResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/inventory/adjustment-reasons/create": {
+      "post": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "CreateInventoryAdjustmentReason",
+        "operationId": "CreateInventoryAdjustmentReason",
+        "description": "Creates a custom inventory adjustment reason.",
+        "x-release-status": "BETA",
+        "security": [
+          {
+            "oauth2": [
+              "INVENTORY_WRITE"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "An object containing the fields to POST for the request.\n\nSee the corresponding object definition for field details.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateInventoryAdjustmentReasonRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateInventoryAdjustmentReasonResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/inventory/adjustment-reasons/delete": {
+      "post": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "DeleteInventoryAdjustmentReason",
+        "operationId": "DeleteInventoryAdjustmentReason",
+        "description": "Soft deletes a custom inventory adjustment reason.",
+        "x-release-status": "BETA",
+        "security": [
+          {
+            "oauth2": [
+              "INVENTORY_WRITE"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "An object containing the fields to POST for the request.\n\nSee the corresponding object definition for field details.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteInventoryAdjustmentReasonRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteInventoryAdjustmentReasonResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/inventory/adjustment-reasons/restore": {
+      "post": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "RestoreInventoryAdjustmentReason",
+        "operationId": "RestoreInventoryAdjustmentReason",
+        "description": "Restores a soft-deleted custom inventory adjustment reason.",
+        "x-release-status": "BETA",
+        "security": [
+          {
+            "oauth2": [
+              "INVENTORY_WRITE"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "An object containing the fields to POST for the request.\n\nSee the corresponding object definition for field details.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RestoreInventoryAdjustmentReasonRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RestoreInventoryAdjustmentReasonResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/inventory/adjustment-reasons/retrieve": {
+      "post": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "RetrieveInventoryAdjustmentReason",
+        "operationId": "RetrieveInventoryAdjustmentReason",
+        "description": "Returns the inventory adjustment reason identified by the provided\n`reason_id`. Deleted custom reasons can be retrieved by ID.",
+        "x-release-status": "BETA",
+        "security": [
+          {
+            "oauth2": [
+              "INVENTORY_READ"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "An object containing the fields to POST for the request.\n\nSee the corresponding object definition for field details.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetrieveInventoryAdjustmentReasonRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrieveInventoryAdjustmentReasonResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/inventory/adjustment-reasons/update": {
+      "put": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "UpdateInventoryAdjustmentReason",
+        "operationId": "UpdateInventoryAdjustmentReason",
+        "description": "Updates a custom inventory adjustment reason.",
+        "x-release-status": "BETA",
+        "security": [
+          {
+            "oauth2": [
+              "INVENTORY_WRITE"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "An object containing the fields to POST for the request.\n\nSee the corresponding object definition for field details.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInventoryAdjustmentReasonRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateInventoryAdjustmentReasonResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/v2/inventory/adjustment/{adjustment_id}": {
       "get": {
         "tags": [
@@ -68359,6 +69781,48 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RetrieveInventoryAdjustmentResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v2/inventory/adjustments/update": {
+      "put": {
+        "tags": [
+          "Inventory"
+        ],
+        "summary": "UpdateInventoryAdjustment",
+        "operationId": "UpdateInventoryAdjustment",
+        "description": "Applies an update to the provided adjustment.\n\nOn success: returns the newly updated adjustment.\nOn failure: returns a list of related errors.",
+        "x-release-status": "BETA",
+        "security": [
+          {
+            "oauth2": [
+              "INVENTORY_WRITE"
+            ]
+          }
+        ],
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "description": "An object containing the fields to POST for the request.\n\nSee the corresponding object definition for field details.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateInventoryAdjustmentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UpdateInventoryAdjustmentResponse"
                 }
               }
             }
@@ -68758,47 +70222,6 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/RetrieveInventoryPhysicalCountResponse"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/v2/inventory/transfers/{transfer_id}": {
-      "get": {
-        "tags": [
-          "Inventory"
-        ],
-        "summary": "RetrieveInventoryTransfer",
-        "operationId": "RetrieveInventoryTransfer",
-        "description": "Returns the [InventoryTransfer](entity:InventoryTransfer) object\nwith the provided `transfer_id`.",
-        "x-release-status": "BETA",
-        "security": [
-          {
-            "oauth2": [
-              "INVENTORY_READ"
-            ]
-          }
-        ],
-        "parameters": [
-          {
-            "name": "transfer_id",
-            "description": "ID of the [InventoryTransfer](entity:InventoryTransfer) to retrieve.",
-            "schema": {
-              "type": "string"
-            },
-            "in": "path",
-            "required": true
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Success",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/RetrieveInventoryTransferResponse"
                 }
               }
             }
@@ -75109,6 +76532,9 @@
             "error-code": "PAYMENT_LIMIT_EXCEEDED"
           },
           {
+            "error-code": "PAYMENT_SOURCE_NOT_ENABLED_FOR_TARGET"
+          },
+          {
             "error-code": "TEMPORARY_ERROR"
           },
           {
@@ -79239,7 +80665,7 @@
       "name": "version",
       "optional": true,
       "env": "VERSION",
-      "type": "literal\u003c\"2025-10-16\"\u003e"
+      "type": "literal\u003c\"2026-07-15\"\u003e"
     }
   ]
 }

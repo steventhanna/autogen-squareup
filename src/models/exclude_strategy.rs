@@ -19,6 +19,8 @@ pub enum ExcludeStrategy {
     LeastExpensive,
     #[serde(rename = "MOST_EXPENSIVE")]
     MostExpensive,
+    #[serde(rename = "MOST_EXPENSIVE_LOWEST_VALUE")]
+    MostExpensiveLowestValue,
 
 }
 
@@ -27,6 +29,7 @@ impl std::fmt::Display for ExcludeStrategy {
         match self {
             Self::LeastExpensive => write!(f, "LEAST_EXPENSIVE"),
             Self::MostExpensive => write!(f, "MOST_EXPENSIVE"),
+            Self::MostExpensiveLowestValue => write!(f, "MOST_EXPENSIVE_LOWEST_VALUE"),
         }
     }
 }

@@ -12,6 +12,7 @@ Name | Type | Description | Notes
 **destination_details** | Option<[**models::DestinationDetails**](DestinationDetails.md)> |  | [optional]
 **amount_money** | [**models::Money**](Money.md) |  | 
 **app_fee_money** | Option<[**models::Money**](Money.md)> |  | [optional]
+**app_fee_allocations** | Option<[**Vec<models::AppFeeAllocation>**](AppFeeAllocation.md)> | Details pertaining to contributors to the refund of the application fee. | [optional][readonly]
 **processing_fee** | Option<[**Vec<models::ProcessingFee>**](ProcessingFee.md)> | Processing fees and fee adjustments assessed by Square for this refund. | [optional]
 **payment_id** | Option<**String**> | The ID of the payment associated with this refund. | [optional]
 **order_id** | Option<**String**> | The ID of the order associated with the refund. | [optional]

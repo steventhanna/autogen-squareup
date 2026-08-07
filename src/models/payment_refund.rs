@@ -35,6 +35,9 @@ pub struct PaymentRefund {
     pub amount_money: Box<models::Money>,
     #[serde(rename = "app_fee_money", skip_serializing_if = "Option::is_none")]
     pub app_fee_money: Option<Box<models::Money>>,
+    /// Details pertaining to contributors to the refund of the application fee.
+    #[serde(rename = "app_fee_allocations", skip_serializing_if = "Option::is_none")]
+    pub app_fee_allocations: Option<Vec<serde_json::Value>>,
     /// Processing fees and fee adjustments assessed by Square for this refund.
     #[serde(rename = "processing_fee", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub processing_fee: Option<Option<Vec<models::ProcessingFee>>>,
@@ -73,6 +76,7 @@ impl PaymentRefund {
             destination_details: None,
             amount_money: Box::new(amount_money),
             app_fee_money: None,
+            app_fee_allocations: None,
             processing_fee: None,
             payment_id: None,
             order_id: None,

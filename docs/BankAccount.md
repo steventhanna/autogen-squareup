@@ -21,6 +21,7 @@ Name | Type | Description | Notes
 **fingerprint** | Option<**String**> | A Square-assigned, unique identifier for the bank account based on the account information. The account fingerprint can be used to compare account entries and determine if the they represent the same real-world bank account. | [optional]
 **version** | Option<**i32**> | The current version of the `BankAccount`. | [optional]
 **bank_name** | Option<**String**> | Read only. Name of actual financial institution.  For example \"Bank of America\". | [optional]
+**customer_id** | Option<**String**> | The ID of the customer who owns the bank account | [optional][readonly]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

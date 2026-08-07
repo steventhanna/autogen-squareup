@@ -21,13 +21,13 @@ pub struct FulfillmentDeliveryDetails {
     /// The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates) indicating when the fulfillment was placed. The timestamp must be in RFC 3339 format (for example, \"2016-09-04T23:59:33.123Z\").  Must be in RFC 3339 timestamp format, e.g., \"2016-09-04T23:59:33.123Z\".
     #[serde(rename = "placed_at", skip_serializing_if = "Option::is_none")]
     pub placed_at: Option<String>,
-    /// The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates) that represents the start of the delivery period. When the fulfillment `schedule_type` is `ASAP`, the field is automatically set to the current time plus the `prep_time_duration`. Otherwise, the application can set this field while the fulfillment `state` is `PROPOSED`, `RESERVED`, or `PREPARED` (any time before the terminal state such as `COMPLETED`, `CANCELED`, and `FAILED`).  The timestamp must be in RFC 3339 format (for example, \"2016-09-04T23:59:33.123Z\").
+    /// The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates) that represents the start of the delivery period. The application can set this field while the fulfillment `state` is `PROPOSED`, `RESERVED`, or `PREPARED` (any time before the terminal state such as `COMPLETED`, `CANCELED`, and `FAILED`).  The timestamp must be in RFC 3339 format (for example, \"2016-09-04T23:59:33.123Z\").  For fulfillments with the schedule type `ASAP`, this is automatically set to the current time plus `prep_time_duration`, if available.
     #[serde(rename = "deliver_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub deliver_at: Option<Option<String>>,
-    /// The duration of time it takes to prepare and deliver this fulfillment. The duration must be in RFC 3339 format (for example, \"P1W3D\").
+    /// The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates) needed to prepare and deliver this fulfillment. The duration must be in RFC 3339 format (for example, \"PT30M\" for 30 minutes). Don't confuse \"M\" for months with \"M\" for minutes. \"P5M\" means 5 months, while \"PT5M\" means 5 minutes.
     #[serde(rename = "prep_time_duration", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub prep_time_duration: Option<Option<String>>,
-    /// The time period after `deliver_at` in which to deliver the order. Applications can set this field when the fulfillment `state` is `PROPOSED`, `RESERVED`, or `PREPARED` (any time before the terminal state such as `COMPLETED`, `CANCELED`, and `FAILED`).  The duration must be in RFC 3339 format (for example, \"P1W3D\").
+    /// The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates) after `deliver_at` in which to deliver the order. Applications can set this field when the fulfillment `state` is `PROPOSED`, `RESERVED`, or `PREPARED` (any time before the terminal state such as `COMPLETED`, `CANCELED`, and `FAILED`).  The duration must be in RFC 3339 format (for example, \"PT30M\" for 30 minutes). Don't confuse \"M\" for months with \"M\" for minutes. \"P5M\" means 5 months, while \"PT5M\" means 5 minutes.
     #[serde(rename = "delivery_window_duration", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub delivery_window_duration: Option<Option<String>>,
     /// Provides additional instructions about the delivery fulfillment. It is displayed in the Square Point of Sale application and set by the API.
@@ -57,7 +57,7 @@ pub struct FulfillmentDeliveryDetails {
     /// The [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates) indicating when an order can be picked up by the courier for delivery. The timestamp must be in RFC 3339 format (for example, \"2016-09-04T23:59:33.123Z\").
     #[serde(rename = "courier_pickup_at", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub courier_pickup_at: Option<Option<String>>,
-    /// The time period after `courier_pickup_at` in which the courier should pick up the order. The duration must be in RFC 3339 format (for example, \"P1W3D\").
+    /// The [duration](https://developer.squareup.com/docs/build-basics/working-with-dates) after `courier_pickup_at` in which the courier should pick up the order. The duration must be in RFC 3339 format (for example, \"PT30M\" for 30 minutes). Don't confuse \"M\" for months with \"M\" for minutes. \"P5M\" means 5 months, while \"PT5M\" means 5 minutes.
     #[serde(rename = "courier_pickup_window_duration", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub courier_pickup_window_duration: Option<Option<String>>,
     /// Whether the delivery is preferred to be no contact.

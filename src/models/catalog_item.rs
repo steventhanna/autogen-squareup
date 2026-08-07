@@ -32,6 +32,9 @@ pub struct CatalogItem {
     /// The ID of the item's category, if any. Deprecated since 2023-12-13. Use `CatalogItem.categories`, instead.
     #[serde(rename = "category_id", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub category_id: Option<Option<String>>,
+    /// The override to a product name to display to users
+    #[serde(rename = "buyer_facing_name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub buyer_facing_name: Option<Option<String>>,
     /// A set of IDs indicating the taxes enabled for this item. When updating an item, any taxes listed here will be added to the item. Taxes may also be added to or deleted from an item using `UpdateItemTaxes`.
     #[serde(rename = "tax_ids", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub tax_ids: Option<Option<Vec<String>>>,
@@ -61,7 +64,7 @@ pub struct CatalogItem {
     /// A name to sort the item by. If this name is unspecified, namely, the `sort_name` field is absent, the regular `name` field is used for sorting. Its value must not be empty.  It is currently supported for sellers of the Japanese locale only.
     #[serde(rename = "sort_name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub sort_name: Option<Option<String>>,
-    /// The list of categories.
+    /// The list of categories to which this item belongs. Each entry includes the category ID and an ordinal value that determines the item's relative position within that category.
     #[serde(rename = "categories", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub categories: Option<Option<Vec<models::CatalogObjectCategory>>>,
     /// The item's description as expressed in valid HTML elements. The length of this field value, including those of HTML tags, is of Unicode points. With application query filters, the text values of the HTML elements and attributes are searchable. Invalid or unsupported HTML elements or attributes are ignored.  Supported HTML elements include: - `a`: Link. Supports linking to website URLs, email address, and telephone numbers. - `b`, `strong`:  Bold text - `br`: Line break - `code`: Computer code - `div`: Section - `h1-h6`: Headings - `i`, `em`: Italics - `li`: List element - `ol`: Numbered list - `p`: Paragraph - `ul`: Bullet list - `u`: Underline   Supported HTML attributes include: - `align`: Alignment of the text content - `href`: Link destination - `rel`: Relationship between link's target and source - `target`: Place to open the linked document
@@ -70,6 +73,9 @@ pub struct CatalogItem {
     /// A server-generated plaintext version of the `description_html` field, without formatting tags.
     #[serde(rename = "description_plaintext", skip_serializing_if = "Option::is_none")]
     pub description_plaintext: Option<String>,
+    /// (Optional) Name that the restaurant wants to display to their kitchen workers instead of the customer-facing name. e.g., customer name might be \"Big John's Mega Burger\" and the kitchen name is \"12oz beef burger\"
+    #[serde(rename = "kitchen_name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub kitchen_name: Option<Option<String>>,
     /// A list of IDs representing channels, such as a Square Online site, where the item can be made visible or available. This field is read only and cannot be edited.
     #[serde(rename = "channels", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub channels: Option<Option<Vec<String>>>,
@@ -97,6 +103,7 @@ impl CatalogItem {
             label_color: None,
             is_taxable: None,
             category_id: None,
+            buyer_facing_name: None,
             tax_ids: None,
             modifier_list_info: None,
             variations: None,
@@ -110,6 +117,7 @@ impl CatalogItem {
             categories: None,
             description_html: None,
             description_plaintext: None,
+            kitchen_name: None,
             channels: None,
             is_archived: None,
             ecom_seo_data: None,

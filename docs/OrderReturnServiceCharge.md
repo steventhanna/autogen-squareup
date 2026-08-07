@@ -19,6 +19,7 @@ Name | Type | Description | Notes
 **applied_taxes** | Option<[**Vec<models::OrderLineItemAppliedTax>**](OrderLineItemAppliedTax.md)> | The list of references to `OrderReturnTax` entities applied to the `OrderReturnServiceCharge`. Each `OrderLineItemAppliedTax` has a `tax_uid` that references the `uid` of a top-level `OrderReturnTax` that is being applied to the `OrderReturnServiceCharge`. On reads, the applied amount is populated. | [optional]
 **treatment_type** | Option<[**models::OrderServiceChargeTreatmentType**](OrderServiceChargeTreatmentType.md)> |  | [optional]
 **scope** | Option<[**models::OrderServiceChargeScope**](OrderServiceChargeScope.md)> |  | [optional]
+**r#type** | Option<[**models::OrderServiceChargeType**](OrderServiceChargeType.md)> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

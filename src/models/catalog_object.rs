@@ -22,7 +22,7 @@ pub struct CatalogObject {
     /// Last modification [timestamp](https://developer.squareup.com/docs/build-basics/working-with-dates) in RFC 3339 format, e.g., `\"2016-08-15T23:59:33.123Z\"` would indicate the UTC time (denoted by `Z`) of August 15, 2016 at 23:59:33 and 123 milliseconds.
     #[serde(rename = "updated_at", skip_serializing_if = "Option::is_none")]
     pub updated_at: Option<String>,
-    /// The version of the object. When updating an object, the version supplied must match the version in the database, otherwise the write will be rejected as conflicting.
+    /// The version of the object. When updating an object, the version supplied should match the version in the database. If it does not, the server attempts a three-way merge. If the client's changes and the concurrent changes don't overlap, the merge succeeds silently. A `VERSION_MISMATCH` error is only returned when both sides changed the same field to different values.  Use the same API version (`Square-Version` header) for both reading and writing catalog objects. The server uses the API version on a write request to determine which missing fields the client intentionally cleared versus which fields the client simply could not see at that version. If a client reads an object at an older API version and writes it back at a newer version, fields that were introduced between those two versions will be absent from the request, and the server will interpret that absence as an intentional clear.
     #[serde(rename = "version", skip_serializing_if = "Option::is_none")]
     pub version: Option<i64>,
     /// If `true`, the object has been deleted from the database. Must be `false` for new objects being inserted. When deleted, the `updated_at` field will equal the deletion time.
@@ -34,13 +34,13 @@ pub struct CatalogObject {
     /// The Connect v1 IDs for this object at each location where it is present, where they differ from the object's Connect V2 ID. The field will only be present for objects that have been created or modified by legacy APIs.
     #[serde(rename = "catalog_v1_ids", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub catalog_v1_ids: Option<Option<Vec<models::CatalogV1Id>>>,
-    /// If `true`, this object is present at all locations (including future locations), except where specified in the `absent_at_location_ids` field. If `false`, this object is not present at any locations (including future locations), except where specified in the `present_at_location_ids` field. If not specified, defaults to `true`.
+    /// Controls whether this object is present at all locations, including future locations.  Most object types have independent location control, including `TAX`, `DISCOUNT`, and `MODIFIER_LIST`.  `ITEM` and `ITEM_VARIATION` have separate settings, but a variation can only be enabled at locations where its parent item is enabled. Disabling a variation everywhere is valid even when the parent item is enabled at specific locations.  `MODIFIER` objects nested within a `MODIFIER_LIST` inherit location settings from their parent. Some object types, including `CATEGORY`, `IMAGE`, and `CUSTOM_ATTRIBUTE_DEFINITION`, must always be globally enabled and cannot use location-specific fields.  The field operates in two modes. When true (the default), the object is available at all current and future locations except those in `absent_at_location_ids`. When false, the object is available only at locations in `present_at_location_ids`. The unused list in each mode is ignored.
     #[serde(rename = "present_at_all_locations", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub present_at_all_locations: Option<Option<bool>>,
-    /// A list of locations where the object is present, even if `present_at_all_locations` is `false`. This can include locations that are deactivated.
+    /// Locations where the object is present, used when `present_at_all_locations` is false.  When `present_at_all_locations` is true, this field is ignored since the object is already present everywhere. Can include deactivated locations. Empty strings are rejected.
     #[serde(rename = "present_at_location_ids", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub present_at_location_ids: Option<Option<Vec<String>>>,
-    /// A list of locations where the object is not present, even if `present_at_all_locations` is `true`. This can include locations that are deactivated.
+    /// Locations where the object is not present, used when `present_at_all_locations` is true.  When `present_at_all_locations` is false, this field is ignored since the object is already absent everywhere except those in `present_at_location_ids`. Can include deactivated locations. Empty strings are rejected.
     #[serde(rename = "absent_at_location_ids", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub absent_at_location_ids: Option<Option<Vec<String>>>,
     #[serde(rename = "item_data", skip_serializing_if = "Option::is_none")]

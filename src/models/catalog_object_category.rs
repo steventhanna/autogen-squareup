@@ -17,7 +17,7 @@ pub struct CatalogObjectCategory {
     /// The ID of the object's category.
     #[serde(rename = "id", skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
-    /// The order of the object within the context of the category.
+    /// The position of this object within the specified category. When an item is assigned to a category, the ordinal determines the item's position relative to other items in the same category. When used for a parent category reference, the ordinal determines the category's position among its sibling categories.
     #[serde(rename = "ordinal", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub ordinal: Option<Option<i64>>,
 }

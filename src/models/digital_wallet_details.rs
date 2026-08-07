@@ -17,11 +17,16 @@ pub struct DigitalWalletDetails {
     /// The status of the `WALLET` payment. The status can be `AUTHORIZED`, `CAPTURED`, `VOIDED`, or `FAILED`.
     #[serde(rename = "status", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub status: Option<Option<String>>,
-    /// The brand used for the `WALLET` payment. The brand can be `CASH_APP`, `PAYPAY`, `ALIPAY`, `RAKUTEN_PAY`, `AU_PAY`, `D_BARAI`, `MERPAY`, `WECHAT_PAY` or `UNKNOWN`.
+    /// The brand used for the `WALLET` payment. The brand can be `CASH_APP`, `PAYPAY`, `ALIPAY`, `RAKUTEN_PAY`, `AU_PAY`, `D_BARAI`, `MERPAY`, `WECHAT_PAY`, `LIGHTNING` or `UNKNOWN`.
     #[serde(rename = "brand", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub brand: Option<Option<String>>,
     #[serde(rename = "cash_app_details", skip_serializing_if = "Option::is_none")]
     pub cash_app_details: Option<Box<models::CashAppDetails>>,
+    #[serde(rename = "lightning_details", skip_serializing_if = "Option::is_none")]
+    pub lightning_details: Option<Box<models::LightningDetails>>,
+    /// Information about errors encountered during the payment.
+    #[serde(rename = "errors", skip_serializing_if = "Option::is_none")]
+    pub errors: Option<Vec<models::Error>>,
 }
 
 impl DigitalWalletDetails {
@@ -31,6 +36,8 @@ impl DigitalWalletDetails {
             status: None,
             brand: None,
             cash_app_details: None,
+            lightning_details: None,
+            errors: None,
         }
     }
 }

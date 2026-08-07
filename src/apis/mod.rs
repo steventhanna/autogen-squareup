@@ -165,8 +165,6 @@ pub mod loyalty_api;
 pub mod merchant_custom_attributes_api;
 #[cfg(feature = "merchants")]
 pub mod merchants_api;
-#[cfg(feature = "mobile-authorization")]
-pub mod mobile_authorization_api;
 #[cfg(feature = "oauth")]
 pub mod o_auth_api;
 #[cfg(feature = "order-custom-attributes")]

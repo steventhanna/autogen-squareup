@@ -7,16 +7,22 @@ Method | HTTP request | Description
 [**batch_change_inventory**](InventoryApi.md#batch_change_inventory) | **POST** /v2/inventory/changes/batch-create | BatchChangeInventory
 [**batch_retrieve_inventory_changes**](InventoryApi.md#batch_retrieve_inventory_changes) | **POST** /v2/inventory/changes/batch-retrieve | BatchRetrieveInventoryChanges
 [**batch_retrieve_inventory_counts**](InventoryApi.md#batch_retrieve_inventory_counts) | **POST** /v2/inventory/counts/batch-retrieve | BatchRetrieveInventoryCounts
+[**create_inventory_adjustment_reason**](InventoryApi.md#create_inventory_adjustment_reason) | **POST** /v2/inventory/adjustment-reasons/create | CreateInventoryAdjustmentReason
+[**delete_inventory_adjustment_reason**](InventoryApi.md#delete_inventory_adjustment_reason) | **POST** /v2/inventory/adjustment-reasons/delete | DeleteInventoryAdjustmentReason
 [**deprecated_batch_change_inventory**](InventoryApi.md#deprecated_batch_change_inventory) | **POST** /v2/inventory/batch-change | DeprecatedBatchChangeInventory
 [**deprecated_batch_retrieve_inventory_changes**](InventoryApi.md#deprecated_batch_retrieve_inventory_changes) | **POST** /v2/inventory/batch-retrieve-changes | DeprecatedBatchRetrieveInventoryChanges
 [**deprecated_batch_retrieve_inventory_counts**](InventoryApi.md#deprecated_batch_retrieve_inventory_counts) | **POST** /v2/inventory/batch-retrieve-counts | DeprecatedBatchRetrieveInventoryCounts
 [**deprecated_retrieve_inventory_adjustment**](InventoryApi.md#deprecated_retrieve_inventory_adjustment) | **GET** /v2/inventory/adjustment/{adjustment_id} | DeprecatedRetrieveInventoryAdjustment
 [**deprecated_retrieve_inventory_physical_count**](InventoryApi.md#deprecated_retrieve_inventory_physical_count) | **GET** /v2/inventory/physical-count/{physical_count_id} | DeprecatedRetrieveInventoryPhysicalCount
+[**list_inventory_adjustment_reasons**](InventoryApi.md#list_inventory_adjustment_reasons) | **GET** /v2/inventory/adjustment-reasons | ListInventoryAdjustmentReasons
+[**restore_inventory_adjustment_reason**](InventoryApi.md#restore_inventory_adjustment_reason) | **POST** /v2/inventory/adjustment-reasons/restore | RestoreInventoryAdjustmentReason
 [**retrieve_inventory_adjustment**](InventoryApi.md#retrieve_inventory_adjustment) | **GET** /v2/inventory/adjustments/{adjustment_id} | RetrieveInventoryAdjustment
+[**retrieve_inventory_adjustment_reason**](InventoryApi.md#retrieve_inventory_adjustment_reason) | **POST** /v2/inventory/adjustment-reasons/retrieve | RetrieveInventoryAdjustmentReason
 [**retrieve_inventory_changes**](InventoryApi.md#retrieve_inventory_changes) | **GET** /v2/inventory/{catalog_object_id}/changes | RetrieveInventoryChanges
 [**retrieve_inventory_count**](InventoryApi.md#retrieve_inventory_count) | **GET** /v2/inventory/{catalog_object_id} | RetrieveInventoryCount
 [**retrieve_inventory_physical_count**](InventoryApi.md#retrieve_inventory_physical_count) | **GET** /v2/inventory/physical-counts/{physical_count_id} | RetrieveInventoryPhysicalCount
-[**retrieve_inventory_transfer**](InventoryApi.md#retrieve_inventory_transfer) | **GET** /v2/inventory/transfers/{transfer_id} | RetrieveInventoryTransfer
+[**update_inventory_adjustment**](InventoryApi.md#update_inventory_adjustment) | **PUT** /v2/inventory/adjustments/update | UpdateInventoryAdjustment
+[**update_inventory_adjustment_reason**](InventoryApi.md#update_inventory_adjustment_reason) | **PUT** /v2/inventory/adjustment-reasons/update | UpdateInventoryAdjustmentReason
 
 
 
@@ -97,6 +103,66 @@ Name | Type | Description  | Required | Notes
 ### Return type
 
 [**models::BatchRetrieveInventoryCountsResponse**](BatchRetrieveInventoryCountsResponse.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## create_inventory_adjustment_reason
+
+> models::CreateInventoryAdjustmentReasonResponse create_inventory_adjustment_reason(create_inventory_adjustment_reason_request)
+CreateInventoryAdjustmentReason
+
+Creates a custom inventory adjustment reason.
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**create_inventory_adjustment_reason_request** | [**CreateInventoryAdjustmentReasonRequest**](CreateInventoryAdjustmentReasonRequest.md) | An object containing the fields to POST for the request.  See the corresponding object definition for field details. | [required] |
+
+### Return type
+
+[**models::CreateInventoryAdjustmentReasonResponse**](CreateInventoryAdjustmentReasonResponse.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## delete_inventory_adjustment_reason
+
+> models::DeleteInventoryAdjustmentReasonResponse delete_inventory_adjustment_reason(delete_inventory_adjustment_reason_request)
+DeleteInventoryAdjustmentReason
+
+Soft deletes a custom inventory adjustment reason.
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**delete_inventory_adjustment_reason_request** | [**DeleteInventoryAdjustmentReasonRequest**](DeleteInventoryAdjustmentReasonRequest.md) | An object containing the fields to POST for the request.  See the corresponding object definition for field details. | [required] |
+
+### Return type
+
+[**models::DeleteInventoryAdjustmentReasonResponse**](DeleteInventoryAdjustmentReasonResponse.md)
 
 ### Authorization
 
@@ -260,6 +326,67 @@ Name | Type | Description  | Required | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
+## list_inventory_adjustment_reasons
+
+> models::ListInventoryAdjustmentReasonsResponse list_inventory_adjustment_reasons(include_deleted, include_system_codes)
+ListInventoryAdjustmentReasons
+
+Returns the standard and custom inventory adjustment reasons available to the seller.
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**include_deleted** | Option<**bool**> | Indicates whether the response should include deleted custom inventory adjustment reasons. The default value is `false`. |  |[default to false]
+**include_system_codes** | Option<**bool**> | Indicates whether the response should include Square-generated system inventory adjustment reason codes that cannot be used to write adjustments from the Connect API, such as `SALE`, `RECOUNT`, `TRANSFER`, `IN_TRANSIT`, and `CANCELED_SALE`. The default value is `false`. |  |[default to false]
+
+### Return type
+
+[**models::ListInventoryAdjustmentReasonsResponse**](ListInventoryAdjustmentReasonsResponse.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+- **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## restore_inventory_adjustment_reason
+
+> models::RestoreInventoryAdjustmentReasonResponse restore_inventory_adjustment_reason(restore_inventory_adjustment_reason_request)
+RestoreInventoryAdjustmentReason
+
+Restores a soft-deleted custom inventory adjustment reason.
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**restore_inventory_adjustment_reason_request** | [**RestoreInventoryAdjustmentReasonRequest**](RestoreInventoryAdjustmentReasonRequest.md) | An object containing the fields to POST for the request.  See the corresponding object definition for field details. | [required] |
+
+### Return type
+
+[**models::RestoreInventoryAdjustmentReasonResponse**](RestoreInventoryAdjustmentReasonResponse.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
 ## retrieve_inventory_adjustment
 
 > models::RetrieveInventoryAdjustmentResponse retrieve_inventory_adjustment(adjustment_id)
@@ -285,6 +412,36 @@ Name | Type | Description  | Required | Notes
 ### HTTP request headers
 
 - **Content-Type**: Not defined
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## retrieve_inventory_adjustment_reason
+
+> models::RetrieveInventoryAdjustmentReasonResponse retrieve_inventory_adjustment_reason(retrieve_inventory_adjustment_reason_request)
+RetrieveInventoryAdjustmentReason
+
+Returns the inventory adjustment reason identified by the provided `reason_id`. Deleted custom reasons can be retrieved by ID.
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**retrieve_inventory_adjustment_reason_request** | [**RetrieveInventoryAdjustmentReasonRequest**](RetrieveInventoryAdjustmentReasonRequest.md) | An object containing the fields to POST for the request.  See the corresponding object definition for field details. | [required] |
+
+### Return type
+
+[**models::RetrieveInventoryAdjustmentReasonResponse**](RetrieveInventoryAdjustmentReasonResponse.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
@@ -384,23 +541,23 @@ Name | Type | Description  | Required | Notes
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
 
 
-## retrieve_inventory_transfer
+## update_inventory_adjustment
 
-> models::RetrieveInventoryTransferResponse retrieve_inventory_transfer(transfer_id)
-RetrieveInventoryTransfer
+> models::UpdateInventoryAdjustmentResponse update_inventory_adjustment(update_inventory_adjustment_request)
+UpdateInventoryAdjustment
 
-Returns the [InventoryTransfer](entity:InventoryTransfer) object with the provided `transfer_id`.
+Applies an update to the provided adjustment.  On success: returns the newly updated adjustment. On failure: returns a list of related errors.
 
 ### Parameters
 
 
 Name | Type | Description  | Required | Notes
 ------------- | ------------- | ------------- | ------------- | -------------
-**transfer_id** | **String** | ID of the [InventoryTransfer](entity:InventoryTransfer) to retrieve. | [required] |
+**update_inventory_adjustment_request** | [**UpdateInventoryAdjustmentRequest**](UpdateInventoryAdjustmentRequest.md) | An object containing the fields to POST for the request.  See the corresponding object definition for field details. | [required] |
 
 ### Return type
 
-[**models::RetrieveInventoryTransferResponse**](RetrieveInventoryTransferResponse.md)
+[**models::UpdateInventoryAdjustmentResponse**](UpdateInventoryAdjustmentResponse.md)
 
 ### Authorization
 
@@ -408,7 +565,37 @@ Name | Type | Description  | Required | Notes
 
 ### HTTP request headers
 
-- **Content-Type**: Not defined
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+[[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)
+
+
+## update_inventory_adjustment_reason
+
+> models::UpdateInventoryAdjustmentReasonResponse update_inventory_adjustment_reason(update_inventory_adjustment_reason_request)
+UpdateInventoryAdjustmentReason
+
+Updates a custom inventory adjustment reason.
+
+### Parameters
+
+
+Name | Type | Description  | Required | Notes
+------------- | ------------- | ------------- | ------------- | -------------
+**update_inventory_adjustment_reason_request** | [**UpdateInventoryAdjustmentReasonRequest**](UpdateInventoryAdjustmentReasonRequest.md) | An object containing the fields to POST for the request.  See the corresponding object definition for field details. | [required] |
+
+### Return type
+
+[**models::UpdateInventoryAdjustmentReasonResponse**](UpdateInventoryAdjustmentReasonResponse.md)
+
+### Authorization
+
+[oauth2](../README.md#oauth2)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
 - **Accept**: application/json
 
 [[Back to top]](#) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to Model list]](../README.md#documentation-for-models) [[Back to README]](../README.md)

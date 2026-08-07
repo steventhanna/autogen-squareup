@@ -21,7 +21,7 @@ pub struct ItemVariationLocationOverrides {
     pub price_money: Option<Box<models::Money>>,
     #[serde(rename = "pricing_type", skip_serializing_if = "Option::is_none")]
     pub pricing_type: Option<models::CatalogPricingType>,
-    /// If `true`, inventory tracking is active for the `CatalogItemVariation` at this `Location`.
+    /// Indicates whether inventory tracking is active for the `CatalogItemVariation` at this `Location`. When set, this value explicitly overrides the global `track_inventory` setting. When unset, the location should use the global value. If both global and location-level values are unset, inventory tracking is disabled.
     #[serde(rename = "track_inventory", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub track_inventory: Option<Option<bool>>,
     #[serde(rename = "inventory_alert_type", skip_serializing_if = "Option::is_none")]

@@ -21,6 +21,9 @@ pub struct BuyNowPayLaterDetails {
     pub afterpay_details: Option<Box<models::AfterpayDetails>>,
     #[serde(rename = "clearpay_details", skip_serializing_if = "Option::is_none")]
     pub clearpay_details: Option<Box<models::ClearpayDetails>>,
+    /// Information about errors encountered during the payment.
+    #[serde(rename = "errors", skip_serializing_if = "Option::is_none")]
+    pub errors: Option<Vec<models::Error>>,
 }
 
 impl BuyNowPayLaterDetails {
@@ -30,6 +33,7 @@ impl BuyNowPayLaterDetails {
             brand: None,
             afterpay_details: None,
             clearpay_details: None,
+            errors: None,
         }
     }
 }

@@ -11,7 +11,7 @@
 use crate::models;
 use serde::{Deserialize, Serialize};
 
-/// InventoryCount : Represents Square-estimated quantity of items in a particular state at a particular seller location based on the known history of physical counts and inventory adjustments.
+/// InventoryCount : Represents Square-estimated quantity of items in a particular state at a particular seller location based on the known history of physical counts and inventory adjustments. The absence of an inventory count indicates that the catalog object hasn't interacted with the given inventory state at the given location.
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct InventoryCount {
     /// The Square-generated ID of the [CatalogObject](entity:CatalogObject) being tracked.
@@ -37,7 +37,7 @@ pub struct InventoryCount {
 }
 
 impl InventoryCount {
-    /// Represents Square-estimated quantity of items in a particular state at a particular seller location based on the known history of physical counts and inventory adjustments.
+    /// Represents Square-estimated quantity of items in a particular state at a particular seller location based on the known history of physical counts and inventory adjustments. The absence of an inventory count indicates that the catalog object hasn't interacted with the given inventory state at the given location.
     pub fn new() -> InventoryCount {
         InventoryCount {
             catalog_object_id: None,

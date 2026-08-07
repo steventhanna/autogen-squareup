@@ -239,6 +239,8 @@ pub enum ErrorCode {
     LocationMismatch,
     #[serde(rename = "ORDER_UNPAID_NOT_RETURNABLE")]
     OrderUnpaidNotReturnable,
+    #[serde(rename = "PARTIAL_PAYMENT_DELAY_CAPTURE_NOT_SUPPORTED")]
+    PartialPaymentDelayCaptureNotSupported,
     #[serde(rename = "IDEMPOTENCY_KEY_REUSED")]
     IdempotencyKeyReused,
     #[serde(rename = "UNEXPECTED_VALUE")]
@@ -269,6 +271,8 @@ pub enum ErrorCode {
     PlaidErrorItemLoginRequired,
     #[serde(rename = "PLAID_ERROR_RATE_LIMIT")]
     PlaidErrorRateLimit,
+    #[serde(rename = "PAYMENT_SOURCE_NOT_ENABLED_FOR_TARGET")]
+    PaymentSourceNotEnabledForTarget,
     #[serde(rename = "CARD_DECLINED")]
     CardDeclined,
     #[serde(rename = "VERIFY_CVV_FAILURE")]
@@ -322,11 +326,18 @@ pub enum ErrorCode {
     #[serde(rename = "GATEWAY_TIMEOUT")]
     GatewayTimeout,
 
+    #[serde(rename = "ISSUER_INSTALLMENT_ERROR")]
+    IssuerInstallmentError,
+    /// Catch-all for error codes the published Square spec does not declare.
+    #[serde(other, rename = "UNKNOWN")]
+    Unknown,
 }
 
 impl std::fmt::Display for ErrorCode {
     fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
         match self {
+            Self::IssuerInstallmentError => write!(f, "ISSUER_INSTALLMENT_ERROR"),
+            Self::Unknown => write!(f, "UNKNOWN"),
             Self::InternalServerError => write!(f, "INTERNAL_SERVER_ERROR"),
             Self::Unauthorized => write!(f, "UNAUTHORIZED"),
             Self::AccessTokenExpired => write!(f, "ACCESS_TOKEN_EXPIRED"),
@@ -439,6 +450,7 @@ impl std::fmt::Display for ErrorCode {
             Self::UnsupportedLoyaltyRewardTier => write!(f, "UNSUPPORTED_LOYALTY_REWARD_TIER"),
             Self::LocationMismatch => write!(f, "LOCATION_MISMATCH"),
             Self::OrderUnpaidNotReturnable => write!(f, "ORDER_UNPAID_NOT_RETURNABLE"),
+            Self::PartialPaymentDelayCaptureNotSupported => write!(f, "PARTIAL_PAYMENT_DELAY_CAPTURE_NOT_SUPPORTED"),
             Self::IdempotencyKeyReused => write!(f, "IDEMPOTENCY_KEY_REUSED"),
             Self::UnexpectedValue => write!(f, "UNEXPECTED_VALUE"),
             Self::SandboxNotSupported => write!(f, "SANDBOX_NOT_SUPPORTED"),
@@ -454,6 +466,7 @@ impl std::fmt::Display for ErrorCode {
             Self::PlaidError => write!(f, "PLAID_ERROR"),
             Self::PlaidErrorItemLoginRequired => write!(f, "PLAID_ERROR_ITEM_LOGIN_REQUIRED"),
             Self::PlaidErrorRateLimit => write!(f, "PLAID_ERROR_RATE_LIMIT"),
+            Self::PaymentSourceNotEnabledForTarget => write!(f, "PAYMENT_SOURCE_NOT_ENABLED_FOR_TARGET"),
             Self::CardDeclined => write!(f, "CARD_DECLINED"),
             Self::VerifyCvvFailure => write!(f, "VERIFY_CVV_FAILURE"),
             Self::VerifyAvsFailure => write!(f, "VERIFY_AVS_FAILURE"),

@@ -14,13 +14,13 @@ use serde::{Deserialize, Serialize};
 /// ListBankAccountsResponse : Response object returned by ListBankAccounts.
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct ListBankAccountsResponse {
-    /// Information on errors encountered during the request.
-    #[serde(rename = "errors", skip_serializing_if = "Option::is_none")]
-    pub errors: Option<Vec<models::Error>>,
     /// List of BankAccounts associated with this account.
     #[serde(rename = "bank_accounts", skip_serializing_if = "Option::is_none")]
     pub bank_accounts: Option<Vec<models::BankAccount>>,
-    /// When a response is truncated, it includes a cursor that you can  use in a subsequent request to fetch next set of bank accounts. If empty, this is the final response.  For more information, see [Pagination](https://developer.squareup.com/docs/working-with-apis/pagination).
+    /// Information on errors encountered during the request.
+    #[serde(rename = "errors", skip_serializing_if = "Option::is_none")]
+    pub errors: Option<Vec<models::Error>>,
+    /// When a response is truncated, it includes a cursor that you can use in a subsequent request to fetch next set of bank accounts. If empty, this is the final response.  For more information, see [Pagination](https://developer.squareup.com/docs/working-with-apis/pagination).
     #[serde(rename = "cursor", skip_serializing_if = "Option::is_none")]
     pub cursor: Option<String>,
 }
@@ -29,8 +29,8 @@ impl ListBankAccountsResponse {
     /// Response object returned by ListBankAccounts.
     pub fn new() -> ListBankAccountsResponse {
         ListBankAccountsResponse {
-            errors: None,
             bank_accounts: None,
+            errors: None,
             cursor: None,
         }
     }

@@ -36,6 +36,20 @@ pub enum BatchRetrieveInventoryCountsError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`create_inventory_adjustment_reason`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum CreateInventoryAdjustmentReasonError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`delete_inventory_adjustment_reason`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DeleteInventoryAdjustmentReasonError {
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`deprecated_batch_change_inventory`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -71,10 +85,31 @@ pub enum DeprecatedRetrieveInventoryPhysicalCountError {
     UnknownValue(serde_json::Value),
 }
 
+/// struct for typed errors of method [`list_inventory_adjustment_reasons`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum ListInventoryAdjustmentReasonsError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`restore_inventory_adjustment_reason`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum RestoreInventoryAdjustmentReasonError {
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`retrieve_inventory_adjustment`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum RetrieveInventoryAdjustmentError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`retrieve_inventory_adjustment_reason`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum RetrieveInventoryAdjustmentReasonError {
     UnknownValue(serde_json::Value),
 }
 
@@ -99,10 +134,17 @@ pub enum RetrieveInventoryPhysicalCountError {
     UnknownValue(serde_json::Value),
 }
 
-/// struct for typed errors of method [`retrieve_inventory_transfer`]
+/// struct for typed errors of method [`update_inventory_adjustment`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
-pub enum RetrieveInventoryTransferError {
+pub enum UpdateInventoryAdjustmentError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`update_inventory_adjustment_reason`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum UpdateInventoryAdjustmentReasonError {
     UnknownValue(serde_json::Value),
 }
 
@@ -226,6 +268,88 @@ pub async fn batch_retrieve_inventory_counts(configuration: &configuration::Conf
     } else {
         let content = resp.text().await?;
         let entity: Option<BatchRetrieveInventoryCountsError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+/// Creates a custom inventory adjustment reason.
+pub async fn create_inventory_adjustment_reason(configuration: &configuration::Configuration, create_inventory_adjustment_reason_request: models::CreateInventoryAdjustmentReasonRequest) -> Result<models::CreateInventoryAdjustmentReasonResponse, Error<CreateInventoryAdjustmentReasonError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_create_inventory_adjustment_reason_request = create_inventory_adjustment_reason_request;
+
+    let uri_str = format!("{}/v2/inventory/adjustment-reasons/create", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    if let Some(ref token) = configuration.oauth_access_token {
+        req_builder = req_builder.bearer_auth(token.to_owned());
+    };
+    req_builder = req_builder.json(&p_create_inventory_adjustment_reason_request);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::CreateInventoryAdjustmentReasonResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::CreateInventoryAdjustmentReasonResponse`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<CreateInventoryAdjustmentReasonError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+/// Soft deletes a custom inventory adjustment reason.
+pub async fn delete_inventory_adjustment_reason(configuration: &configuration::Configuration, delete_inventory_adjustment_reason_request: models::DeleteInventoryAdjustmentReasonRequest) -> Result<models::DeleteInventoryAdjustmentReasonResponse, Error<DeleteInventoryAdjustmentReasonError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_delete_inventory_adjustment_reason_request = delete_inventory_adjustment_reason_request;
+
+    let uri_str = format!("{}/v2/inventory/adjustment-reasons/delete", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    if let Some(ref token) = configuration.oauth_access_token {
+        req_builder = req_builder.bearer_auth(token.to_owned());
+    };
+    req_builder = req_builder.json(&p_delete_inventory_adjustment_reason_request);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::DeleteInventoryAdjustmentReasonResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::DeleteInventoryAdjustmentReasonResponse`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<DeleteInventoryAdjustmentReasonError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent { status, content, entity }))
     }
 }
@@ -433,6 +557,94 @@ pub async fn deprecated_retrieve_inventory_physical_count(configuration: &config
     }
 }
 
+/// Returns the standard and custom inventory adjustment reasons available to the seller.
+pub async fn list_inventory_adjustment_reasons(configuration: &configuration::Configuration, include_deleted: Option<bool>, include_system_codes: Option<bool>) -> Result<models::ListInventoryAdjustmentReasonsResponse, Error<ListInventoryAdjustmentReasonsError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_include_deleted = include_deleted;
+    let p_include_system_codes = include_system_codes;
+
+    let uri_str = format!("{}/v2/inventory/adjustment-reasons", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+
+    if let Some(ref param_value) = p_include_deleted {
+        req_builder = req_builder.query(&[("include_deleted", &param_value.to_string())]);
+    }
+    if let Some(ref param_value) = p_include_system_codes {
+        req_builder = req_builder.query(&[("include_system_codes", &param_value.to_string())]);
+    }
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    if let Some(ref token) = configuration.oauth_access_token {
+        req_builder = req_builder.bearer_auth(token.to_owned());
+    };
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::ListInventoryAdjustmentReasonsResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::ListInventoryAdjustmentReasonsResponse`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<ListInventoryAdjustmentReasonsError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+/// Restores a soft-deleted custom inventory adjustment reason.
+pub async fn restore_inventory_adjustment_reason(configuration: &configuration::Configuration, restore_inventory_adjustment_reason_request: models::RestoreInventoryAdjustmentReasonRequest) -> Result<models::RestoreInventoryAdjustmentReasonResponse, Error<RestoreInventoryAdjustmentReasonError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_restore_inventory_adjustment_reason_request = restore_inventory_adjustment_reason_request;
+
+    let uri_str = format!("{}/v2/inventory/adjustment-reasons/restore", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    if let Some(ref token) = configuration.oauth_access_token {
+        req_builder = req_builder.bearer_auth(token.to_owned());
+    };
+    req_builder = req_builder.json(&p_restore_inventory_adjustment_reason_request);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::RestoreInventoryAdjustmentReasonResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::RestoreInventoryAdjustmentReasonResponse`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<RestoreInventoryAdjustmentReasonError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
 /// Returns the [InventoryAdjustment](entity:InventoryAdjustment) object with the provided `adjustment_id`.
 pub async fn retrieve_inventory_adjustment(configuration: &configuration::Configuration, adjustment_id: &str) -> Result<models::RetrieveInventoryAdjustmentResponse, Error<RetrieveInventoryAdjustmentError>> {
     // add a prefix to parameters to efficiently prevent name collisions
@@ -469,6 +681,47 @@ pub async fn retrieve_inventory_adjustment(configuration: &configuration::Config
     } else {
         let content = resp.text().await?;
         let entity: Option<RetrieveInventoryAdjustmentError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+/// Returns the inventory adjustment reason identified by the provided `reason_id`. Deleted custom reasons can be retrieved by ID.
+pub async fn retrieve_inventory_adjustment_reason(configuration: &configuration::Configuration, retrieve_inventory_adjustment_reason_request: models::RetrieveInventoryAdjustmentReasonRequest) -> Result<models::RetrieveInventoryAdjustmentReasonResponse, Error<RetrieveInventoryAdjustmentReasonError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_retrieve_inventory_adjustment_reason_request = retrieve_inventory_adjustment_reason_request;
+
+    let uri_str = format!("{}/v2/inventory/adjustment-reasons/retrieve", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    if let Some(ref token) = configuration.oauth_access_token {
+        req_builder = req_builder.bearer_auth(token.to_owned());
+    };
+    req_builder = req_builder.json(&p_retrieve_inventory_adjustment_reason_request);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::RetrieveInventoryAdjustmentReasonResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::RetrieveInventoryAdjustmentReasonResponse`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<RetrieveInventoryAdjustmentReasonError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent { status, content, entity }))
     }
 }
@@ -609,13 +862,13 @@ pub async fn retrieve_inventory_physical_count(configuration: &configuration::Co
     }
 }
 
-/// Returns the [InventoryTransfer](entity:InventoryTransfer) object with the provided `transfer_id`.
-pub async fn retrieve_inventory_transfer(configuration: &configuration::Configuration, transfer_id: &str) -> Result<models::RetrieveInventoryTransferResponse, Error<RetrieveInventoryTransferError>> {
+/// Applies an update to the provided adjustment.  On success: returns the newly updated adjustment. On failure: returns a list of related errors.
+pub async fn update_inventory_adjustment(configuration: &configuration::Configuration, update_inventory_adjustment_request: models::UpdateInventoryAdjustmentRequest) -> Result<models::UpdateInventoryAdjustmentResponse, Error<UpdateInventoryAdjustmentError>> {
     // add a prefix to parameters to efficiently prevent name collisions
-    let p_transfer_id = transfer_id;
+    let p_update_inventory_adjustment_request = update_inventory_adjustment_request;
 
-    let uri_str = format!("{}/v2/inventory/transfers/{transfer_id}", configuration.base_path, transfer_id=crate::apis::urlencode(p_transfer_id));
-    let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
+    let uri_str = format!("{}/v2/inventory/adjustments/update", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
 
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
@@ -623,6 +876,7 @@ pub async fn retrieve_inventory_transfer(configuration: &configuration::Configur
     if let Some(ref token) = configuration.oauth_access_token {
         req_builder = req_builder.bearer_auth(token.to_owned());
     };
+    req_builder = req_builder.json(&p_update_inventory_adjustment_request);
 
     let req = req_builder.build()?;
     let resp = configuration.client.execute(req).await?;
@@ -639,12 +893,53 @@ pub async fn retrieve_inventory_transfer(configuration: &configuration::Configur
         let content = resp.text().await?;
         match content_type {
             ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
-            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::RetrieveInventoryTransferResponse`"))),
-            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::RetrieveInventoryTransferResponse`")))),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::UpdateInventoryAdjustmentResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::UpdateInventoryAdjustmentResponse`")))),
         }
     } else {
         let content = resp.text().await?;
-        let entity: Option<RetrieveInventoryTransferError> = serde_json::from_str(&content).ok();
+        let entity: Option<UpdateInventoryAdjustmentError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+/// Updates a custom inventory adjustment reason.
+pub async fn update_inventory_adjustment_reason(configuration: &configuration::Configuration, update_inventory_adjustment_reason_request: models::UpdateInventoryAdjustmentReasonRequest) -> Result<models::UpdateInventoryAdjustmentReasonResponse, Error<UpdateInventoryAdjustmentReasonError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_update_inventory_adjustment_reason_request = update_inventory_adjustment_reason_request;
+
+    let uri_str = format!("{}/v2/inventory/adjustment-reasons/update", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::PUT, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    if let Some(ref token) = configuration.oauth_access_token {
+        req_builder = req_builder.bearer_auth(token.to_owned());
+    };
+    req_builder = req_builder.json(&p_update_inventory_adjustment_reason_request);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::UpdateInventoryAdjustmentReasonResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::UpdateInventoryAdjustmentReasonResponse`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<UpdateInventoryAdjustmentReasonError> = serde_json::from_str(&content).ok();
         Err(Error::ResponseError(ResponseContent { status, content, entity }))
     }
 }

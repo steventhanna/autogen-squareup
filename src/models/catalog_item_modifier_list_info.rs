@@ -29,7 +29,7 @@ pub struct CatalogItemModifierListInfo {
     /// If `true`, enable this `CatalogModifierList`. The default value is `true`.
     #[serde(rename = "enabled", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub enabled: Option<Option<bool>>,
-    /// The position of this `CatalogItemModifierListInfo` object within the `modifier_list_info` list applied  to a `CatalogItem` instance.
+    /// The position of this `CatalogItemModifierListInfo` object within the `modifier_list_info` list applied to a `CatalogItem` instance.
     #[serde(rename = "ordinal", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub ordinal: Option<Option<i32>>,
     #[serde(rename = "allow_quantities", skip_serializing_if = "Option::is_none")]

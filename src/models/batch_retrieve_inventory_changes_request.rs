@@ -37,6 +37,11 @@ pub struct BatchRetrieveInventoryChangesRequest {
     /// The number of [records](entity:InventoryChange) to return.
     #[serde(rename = "limit", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub limit: Option<Option<i32>>,
+    #[serde(rename = "sort", skip_serializing_if = "Option::is_none")]
+    pub sort: Option<Box<models::BatchRetrieveInventoryChangesSort>>,
+    /// The filter to return `ADJUSTMENT` query results by inventory adjustment reason. This filter is only applied when set. The request cannot include both `reason_ids` and `states`.
+    #[serde(rename = "reason_ids", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub reason_ids: Option<Option<Vec<models::InventoryAdjustmentReasonId>>>,
 }
 
 impl BatchRetrieveInventoryChangesRequest {
@@ -50,6 +55,8 @@ impl BatchRetrieveInventoryChangesRequest {
             updated_before: None,
             cursor: None,
             limit: None,
+            sort: None,
+            reason_ids: None,
         }
     }
 }

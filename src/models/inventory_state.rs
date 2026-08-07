@@ -47,6 +47,8 @@ pub enum InventoryState {
     SupportedByNewerVersion,
     #[serde(rename = "IN_TRANSIT")]
     InTransit,
+    #[serde(rename = "UNTRACKED")]
+    Untracked,
 
 }
 
@@ -69,6 +71,7 @@ impl std::fmt::Display for InventoryState {
             Self::Decomposed => write!(f, "DECOMPOSED"),
             Self::SupportedByNewerVersion => write!(f, "SUPPORTED_BY_NEWER_VERSION"),
             Self::InTransit => write!(f, "IN_TRANSIT"),
+            Self::Untracked => write!(f, "UNTRACKED"),
         }
     }
 }

@@ -14,6 +14,7 @@ Name | Type | Description | Notes
 **scopes** | Option<**Vec<String>**> | The list of permissions that are explicitly requested for the access token. For example, [\"MERCHANT_PROFILE_READ\",\"PAYMENTS_READ\",\"BANK_ACCOUNTS_READ\"].  The returned access token is limited to the permissions that are the intersection of these requested permissions and those authorized by the provided `refresh_token`.  Optional for the code flow and PKCE flow if `grant_type` is `refresh_token`. | [optional]
 **short_lived** | Option<**bool**> | Indicates whether the returned access token should expire in 24 hours.  Optional for the code flow and PKCE flow for any grant type. The default value is `false`. | [optional]
 **code_verifier** | Option<**String**> | The secret your application generated for the authorization request used to obtain the authorization code. This is the source of the `code_challenge` hash you provided in your authorization URL.  Required for the PKCE flow if `grant_type` is `authorization_code`. | [optional]
+**use_jwt** | Option<**bool**> | Indicates whether to use a JWT (JSON Web Token) as the OAuth access token. When set to `true`, the OAuth flow returns a JWT to your application, used in the same way as a regular token. The default value is `false`. | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

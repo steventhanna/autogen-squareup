@@ -59,6 +59,11 @@ pub struct CardPaymentDetails {
     /// Information about errors encountered during the request.
     #[serde(rename = "errors", skip_serializing_if = "Option::is_none")]
     pub errors: Option<Vec<models::Error>>,
+    #[serde(rename = "applied_card_surcharge_details", skip_serializing_if = "Option::is_none")]
+    pub applied_card_surcharge_details: Option<Box<models::CardSurchargeDetails>>,
+    /// The type of digital wallet used for this card payment, if applicable. Currently only populated for in-person Apple Pay payments. Detection has no false positives but may have false negatives (some Apple Pay payments may not be detected).  For payments with `source_type` of `WALLET`, see `DigitalWalletDetails` instead.  Values: `APPLE_PAY`
+    #[serde(rename = "wallet_type", skip_serializing_if = "Option::is_none")]
+    pub wallet_type: Option<String>,
 }
 
 impl CardPaymentDetails {
@@ -81,6 +86,8 @@ impl CardPaymentDetails {
             card_payment_timeline: None,
             refund_requires_card_presence: None,
             errors: None,
+            applied_card_surcharge_details: None,
+            wallet_type: None,
         }
     }
 }

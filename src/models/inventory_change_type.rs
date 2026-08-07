@@ -19,8 +19,6 @@ pub enum InventoryChangeType {
     PhysicalCount,
     #[serde(rename = "ADJUSTMENT")]
     Adjustment,
-    #[serde(rename = "TRANSFER")]
-    Transfer,
 
 }
 
@@ -29,7 +27,6 @@ impl std::fmt::Display for InventoryChangeType {
         match self {
             Self::PhysicalCount => write!(f, "PHYSICAL_COUNT"),
             Self::Adjustment => write!(f, "ADJUSTMENT"),
-            Self::Transfer => write!(f, "TRANSFER"),
         }
     }
 }
