@@ -5,7 +5,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **uid** | Option<**String**> | A unique ID that identifies the service charge only within this order. | [optional]
-**name** | Option<**String**> | The name of the service charge. | [optional]
+**name** | Option<**String**> | The name of the service charge. This is unused and null for AUTO_GRATUITY to match the behavior on Bills. | [optional]
 **catalog_object_id** | Option<**String**> | The catalog object ID referencing the service charge [CatalogObject](entity:CatalogObject). | [optional]
 **catalog_version** | Option<**i64**> | The version of the catalog object that this service charge references. | [optional]
 **percentage** | Option<**String**> | The service charge percentage as a string representation of a decimal number. For example, `\"7.25\"` indicates a service charge of 7.25%.  Exactly 1 of `percentage` or `amount_money` should be set. | [optional]

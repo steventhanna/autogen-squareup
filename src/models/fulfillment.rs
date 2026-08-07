@@ -35,6 +35,8 @@ pub struct Fulfillment {
     pub shipment_details: Option<Box<models::FulfillmentShipmentDetails>>,
     #[serde(rename = "delivery_details", skip_serializing_if = "Option::is_none")]
     pub delivery_details: Option<Box<models::FulfillmentDeliveryDetails>>,
+    #[serde(rename = "in_store_details", skip_serializing_if = "Option::is_none")]
+    pub in_store_details: Option<Box<models::FulfillmentInStoreDetails>>,
 }
 
 impl Fulfillment {
@@ -50,6 +52,7 @@ impl Fulfillment {
             pickup_details: None,
             shipment_details: None,
             delivery_details: None,
+            in_store_details: None,
         }
     }
 }

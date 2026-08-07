@@ -15,6 +15,20 @@ use crate::{apis::ResponseContent, models};
 use super::{Error, configuration, ContentType};
 
 
+/// struct for typed errors of method [`create_bank_account`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum CreateBankAccountError {
+    UnknownValue(serde_json::Value),
+}
+
+/// struct for typed errors of method [`disable_bank_account`]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum DisableBankAccountError {
+    UnknownValue(serde_json::Value),
+}
+
 /// struct for typed errors of method [`get_bank_account`]
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
@@ -37,7 +51,88 @@ pub enum ListBankAccountsError {
 }
 
 
-/// Returns details of a [BankAccount](entity:BankAccount) linked to a Square account.
+/// Store a bank account on file for a square account
+pub async fn create_bank_account(configuration: &configuration::Configuration, create_bank_account_request: models::CreateBankAccountRequest) -> Result<models::CreateBankAccountResponse, Error<CreateBankAccountError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_create_bank_account_request = create_bank_account_request;
+
+    let uri_str = format!("{}/v2/bank-accounts", configuration.base_path);
+    let mut req_builder = configuration.client.request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    if let Some(ref token) = configuration.oauth_access_token {
+        req_builder = req_builder.bearer_auth(token.to_owned());
+    };
+    req_builder = req_builder.json(&p_create_bank_account_request);
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::CreateBankAccountResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::CreateBankAccountResponse`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<CreateBankAccountError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+/// Disable a bank account.
+pub async fn disable_bank_account(configuration: &configuration::Configuration, bank_account_id: &str) -> Result<models::DisableBankAccountResponse, Error<DisableBankAccountError>> {
+    // add a prefix to parameters to efficiently prevent name collisions
+    let p_bank_account_id = bank_account_id;
+
+    let uri_str = format!("{}/v2/bank-accounts/{bank_account_id}/disable", configuration.base_path, bank_account_id=crate::apis::urlencode(p_bank_account_id));
+    let mut req_builder = configuration.client.request(reqwest::Method::POST, &uri_str);
+
+    if let Some(ref user_agent) = configuration.user_agent {
+        req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());
+    }
+    if let Some(ref token) = configuration.oauth_access_token {
+        req_builder = req_builder.bearer_auth(token.to_owned());
+    };
+
+    let req = req_builder.build()?;
+    let resp = configuration.client.execute(req).await?;
+
+    let status = resp.status();
+    let content_type = resp
+        .headers()
+        .get("content-type")
+        .and_then(|v| v.to_str().ok())
+        .unwrap_or("application/octet-stream");
+    let content_type = super::ContentType::from(content_type);
+
+    if !status.is_client_error() && !status.is_server_error() {
+        let content = resp.text().await?;
+        match content_type {
+            ContentType::Json => serde_json::from_str(&content).map_err(Error::from),
+            ContentType::Text => return Err(Error::from(serde_json::Error::custom("Received `text/plain` content type response that cannot be converted to `models::DisableBankAccountResponse`"))),
+            ContentType::Unsupported(unknown_type) => return Err(Error::from(serde_json::Error::custom(format!("Received `{unknown_type}` content type response that cannot be converted to `models::DisableBankAccountResponse`")))),
+        }
+    } else {
+        let content = resp.text().await?;
+        let entity: Option<DisableBankAccountError> = serde_json::from_str(&content).ok();
+        Err(Error::ResponseError(ResponseContent { status, content, entity }))
+    }
+}
+
+/// Retrieve details of a [BankAccount](entity:BankAccount) bank account linked to a Square account.
 pub async fn get_bank_account(configuration: &configuration::Configuration, bank_account_id: &str) -> Result<models::GetBankAccountResponse, Error<GetBankAccountError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_bank_account_id = bank_account_id;
@@ -118,11 +213,12 @@ pub async fn get_bank_account_by_v1_id(configuration: &configuration::Configurat
 }
 
 /// Returns a list of [BankAccount](entity:BankAccount) objects linked to a Square account.
-pub async fn list_bank_accounts(configuration: &configuration::Configuration, cursor: Option<&str>, limit: Option<i32>, location_id: Option<&str>) -> Result<models::ListBankAccountsResponse, Error<ListBankAccountsError>> {
+pub async fn list_bank_accounts(configuration: &configuration::Configuration, cursor: Option<&str>, limit: Option<i32>, location_id: Option<&str>, customer_id: Option<&str>) -> Result<models::ListBankAccountsResponse, Error<ListBankAccountsError>> {
     // add a prefix to parameters to efficiently prevent name collisions
     let p_cursor = cursor;
     let p_limit = limit;
     let p_location_id = location_id;
+    let p_customer_id = customer_id;
 
     let uri_str = format!("{}/v2/bank-accounts", configuration.base_path);
     let mut req_builder = configuration.client.request(reqwest::Method::GET, &uri_str);
@@ -135,6 +231,9 @@ pub async fn list_bank_accounts(configuration: &configuration::Configuration, cu
     }
     if let Some(ref param_value) = p_location_id {
         req_builder = req_builder.query(&[("location_id", &param_value.to_string())]);
+    }
+    if let Some(ref param_value) = p_customer_id {
+        req_builder = req_builder.query(&[("customer_id", &param_value.to_string())]);
     }
     if let Some(ref user_agent) = configuration.user_agent {
         req_builder = req_builder.header(reqwest::header::USER_AGENT, user_agent.clone());

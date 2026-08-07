@@ -27,6 +27,9 @@ pub struct DeviceCheckoutOptions {
     /// Show the itemization screen prior to taking a payment. This field is only meaningful when the checkout includes an order ID. Defaults to true.
     #[serde(rename = "show_itemized_cart", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub show_itemized_cart: Option<Option<bool>>,
+    /// Controls whether the mobile client applies Auto Card Surcharge (ACS) during checkout. If true, ACS is applied based on Dashboard configuration. If false, ACS is not applied regardless of that configuration. For more information, see [Add a Card Surcharge](https://developer.squareup.com/docs/terminal-api/additional-payment-checkout-features#add-a-card-surcharge).
+    #[serde(rename = "allow_auto_card_surcharge", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub allow_auto_card_surcharge: Option<Option<bool>>,
 }
 
 impl DeviceCheckoutOptions {
@@ -37,6 +40,7 @@ impl DeviceCheckoutOptions {
             collect_signature: None,
             tip_settings: None,
             show_itemized_cart: None,
+            allow_auto_card_surcharge: None,
         }
     }
 }

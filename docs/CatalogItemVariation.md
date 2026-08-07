@@ -12,9 +12,9 @@ Name | Type | Description | Notes
 **pricing_type** | Option<[**models::CatalogPricingType**](CatalogPricingType.md)> |  | [optional]
 **price_money** | Option<[**models::Money**](Money.md)> |  | [optional]
 **location_overrides** | Option<[**Vec<models::ItemVariationLocationOverrides>**](ItemVariationLocationOverrides.md)> | Per-location price and inventory overrides. | [optional]
-**track_inventory** | Option<**bool**> | If `true`, inventory tracking is active for the variation. | [optional]
+**track_inventory** | Option<**bool**> | If `true`, inventory tracking is active for the variation at all locations by default. This value can be overridden for specific locations using `ItemVariationLocationOverrides.track_inventory`. If unset at both levels, inventory tracking is disabled. | [optional]
 **inventory_alert_type** | Option<[**models::InventoryAlertType**](InventoryAlertType.md)> |  | [optional]
-**inventory_alert_threshold** | Option<**i64**> | If the inventory quantity for the variation is less than or equal to this value and `inventory_alert_type` is `LOW_QUANTITY`, the variation displays an alert in the merchant dashboard.  This value is always an integer. | [optional]
+**inventory_alert_threshold** | Option<**i64**> | If the inventory quantity for the variation is less than or equal to this value and `inventory_alert_type` is `LOW_QUANTITY`, the variation displays an alert in the merchant dashboard. This value is always an integer.  Deprecated because this field has never been global. | [optional]
 **user_data** | Option<**String**> | Arbitrary user metadata to associate with the item variation. This attribute value length is of Unicode code points. | [optional]
 **service_duration** | Option<**i64**> | If the `CatalogItem` that owns this item variation is of type `APPOINTMENTS_SERVICE`, then this is the duration of the service in milliseconds. For example, a 30 minute appointment would have the value `1800000`, which is equal to 30 (minutes) * 60 (seconds per minute) * 1000 (milliseconds per second). | [optional]
 **available_for_booking** | Option<**bool**> | If the `CatalogItem` that owns this item variation is of type `APPOINTMENTS_SERVICE`, a bool representing whether this service is available for booking. | [optional]
@@ -25,6 +25,8 @@ Name | Type | Description | Notes
 **image_ids** | Option<**Vec<String>**> | The IDs of images associated with this `CatalogItemVariation` instance. These images will be shown to customers in Square Online Store. | [optional]
 **team_member_ids** | Option<**Vec<String>**> | Tokens of employees that can perform the service represented by this variation. Only valid for variations of type `APPOINTMENTS_SERVICE`. | [optional]
 **stockable_conversion** | Option<[**models::CatalogStockConversion**](CatalogStockConversion.md)> |  | [optional]
+**kitchen_name** | Option<**String**> | (Optional) Name that the restaurant wants to display to their kitchen workers instead of the customer-facing name. e.g., customer name might be \"Mega-Jumbo Triplesized\" and the kitchen name is \"Large container\" | [optional]
+**vendor_information** | Option<[**Vec<models::CatalogItemVariationVendorInformation>**](CatalogItemVariationVendorInformation.md)> | Details of the vendor this product is purchased from. This field can be set only if the seller has an active subscription to either Square for Retail Premium or Square for Restaurants Premium. | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

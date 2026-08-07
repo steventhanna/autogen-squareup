@@ -21,6 +21,9 @@ pub struct RefundPaymentRequest {
     pub amount_money: Box<models::Money>,
     #[serde(rename = "app_fee_money", skip_serializing_if = "Option::is_none")]
     pub app_fee_money: Option<Box<models::Money>>,
+    /// Details pertaining to contributors to the refund of the application fee. The sum of the amounts in the app_fee_allocations must equal the app_fee_money amount, if present. If populated, an allocation must be present for every party that expects to contribute a portion of the refunded application fee, including the application developer.
+    #[serde(rename = "app_fee_allocations", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub app_fee_allocations: Option<Option<Vec<serde_json::Value>>>,
     /// The unique ID of the payment being refunded. Required when unlinked=false, otherwise must not be set.
     #[serde(rename = "payment_id", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub payment_id: Option<Option<String>>,
@@ -58,6 +61,7 @@ impl RefundPaymentRequest {
             idempotency_key,
             amount_money: Box::new(amount_money),
             app_fee_money: None,
+            app_fee_allocations: None,
             payment_id: None,
             destination_id: None,
             unlinked: None,

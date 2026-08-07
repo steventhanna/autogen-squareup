@@ -17,7 +17,7 @@ pub struct OrderServiceCharge {
     /// A unique ID that identifies the service charge only within this order.
     #[serde(rename = "uid", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub uid: Option<Option<String>>,
-    /// The name of the service charge.
+    /// The name of the service charge. This is unused and null for AUTO_GRATUITY to match the behavior on Bills.
     #[serde(rename = "name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub name: Option<Option<String>>,
     /// The catalog object ID referencing the service charge [CatalogObject](entity:CatalogObject).

@@ -55,6 +55,12 @@ pub struct Card {
     /// The first six digits of the card number, known as the Bank Identification Number (BIN). Only the Payments API returns this field.
     #[serde(rename = "bin", skip_serializing_if = "Option::is_none")]
     pub bin: Option<String>,
+    /// Timestamp for when the card object was created on Square’s servers. In RFC 3339 format, e.g., \"2016-09-04T23:59:33.123Z\".
+    #[serde(rename = "created_at", skip_serializing_if = "Option::is_none")]
+    pub created_at: Option<String>,
+    /// Timestamp for when the card object was disabled on Square’s servers. In RFC 3339 format, e.g., \"2016-09-04T23:59:33.123Z\".
+    #[serde(rename = "disabled_at", skip_serializing_if = "Option::is_none")]
+    pub disabled_at: Option<String>,
     /// Current version number of the card. Increments with each card update. Requests to update an existing Card object will be rejected unless the version in the request matches the current version for the Card.
     #[serde(rename = "version", skip_serializing_if = "Option::is_none")]
     pub version: Option<i64>,
@@ -89,6 +95,8 @@ impl Card {
             card_type: None,
             prepaid_type: None,
             bin: None,
+            created_at: None,
+            disabled_at: None,
             version: None,
             card_co_brand: None,
             issuer_alert: None,

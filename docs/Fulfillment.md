@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **pickup_details** | Option<[**models::FulfillmentPickupDetails**](FulfillmentPickupDetails.md)> |  | [optional]
 **shipment_details** | Option<[**models::FulfillmentShipmentDetails**](FulfillmentShipmentDetails.md)> |  | [optional]
 **delivery_details** | Option<[**models::FulfillmentDeliveryDetails**](FulfillmentDeliveryDetails.md)> |  | [optional]
+**in_store_details** | Option<[**models::FulfillmentInStoreDetails**](FulfillmentInStoreDetails.md)> |  | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -40,6 +40,8 @@ docs/BatchRetrieveCatalogObjectsRequest.md
 docs/BatchRetrieveCatalogObjectsResponse.md
 docs/BatchRetrieveInventoryChangesRequest.md
 docs/BatchRetrieveInventoryChangesResponse.md
+docs/BatchRetrieveInventoryChangesSort.md
+docs/BatchRetrieveInventoryChangesSortField.md
 docs/BatchRetrieveInventoryCountsRequest.md
 docs/BatchRetrieveInventoryCountsResponse.md
 docs/BatchRetrieveOrdersRequest.md
@@ -187,6 +189,7 @@ docs/CardIssuerAlert.md
 docs/CardPaymentDetails.md
 docs/CardPaymentTimeline.md
 docs/CardPrepaidType.md
+docs/CardSurchargeDetails.md
 docs/CardType.md
 docs/CardUpdatedEvent.md
 docs/CardUpdatedEventData.md
@@ -236,12 +239,14 @@ docs/CatalogItemOptionValue.md
 docs/CatalogItemOptionValueForItemVariation.md
 docs/CatalogItemProductType.md
 docs/CatalogItemVariation.md
+docs/CatalogItemVariationVendorInformation.md
 docs/CatalogMeasurementUnit.md
 docs/CatalogModifier.md
 docs/CatalogModifierList.md
 docs/CatalogModifierListModifierType.md
 docs/CatalogModifierListSelectionType.md
 docs/CatalogModifierOverride.md
+docs/CatalogModifierToggleOverrideType.md
 docs/CatalogObject.md
 docs/CatalogObjectBatch.md
 docs/CatalogObjectCategory.md
@@ -311,6 +316,8 @@ docs/ConfirmationDecision.md
 docs/ConfirmationOptions.md
 docs/Coordinates.md
 docs/Country.md
+docs/CreateBankAccountRequest.md
+docs/CreateBankAccountResponse.md
 docs/CreateBookingCustomAttributeDefinitionRequest.md
 docs/CreateBookingCustomAttributeDefinitionResponse.md
 docs/CreateBookingRequest.md
@@ -341,6 +348,8 @@ docs/CreateGiftCardActivityRequest.md
 docs/CreateGiftCardActivityResponse.md
 docs/CreateGiftCardRequest.md
 docs/CreateGiftCardResponse.md
+docs/CreateInventoryAdjustmentReasonRequest.md
+docs/CreateInventoryAdjustmentReasonResponse.md
 docs/CreateInvoiceAttachmentRequest.md
 docs/CreateInvoiceAttachmentResponse.md
 docs/CreateInvoiceRequest.md
@@ -359,8 +368,6 @@ docs/CreateLoyaltyRewardRequest.md
 docs/CreateLoyaltyRewardResponse.md
 docs/CreateMerchantCustomAttributeDefinitionRequest.md
 docs/CreateMerchantCustomAttributeDefinitionResponse.md
-docs/CreateMobileAuthorizationCodeRequest.md
-docs/CreateMobileAuthorizationCodeResponse.md
 docs/CreateOrderCustomAttributeDefinitionRequest.md
 docs/CreateOrderCustomAttributeDefinitionResponse.md
 docs/CreateOrderRequest.md
@@ -472,6 +479,8 @@ docs/DeleteCustomerCustomAttributeResponse.md
 docs/DeleteCustomerGroupResponse.md
 docs/DeleteCustomerResponse.md
 docs/DeleteDisputeEvidenceResponse.md
+docs/DeleteInventoryAdjustmentReasonRequest.md
+docs/DeleteInventoryAdjustmentReasonResponse.md
 docs/DeleteInvoiceAttachmentResponse.md
 docs/DeleteInvoiceResponse.md
 docs/DeleteLocationCustomAttributeDefinitionResponse.md
@@ -519,6 +528,7 @@ docs/DeviceStatus.md
 docs/DeviceStatusCategory.md
 docs/DevicesApi.md
 docs/DigitalWalletDetails.md
+docs/DisableBankAccountResponse.md
 docs/DisableCardResponse.md
 docs/DisableEventsResponse.md
 docs/DismissTerminalActionResponse.md
@@ -554,6 +564,7 @@ docs/DisputeStateUpdatedEventObject.md
 docs/DisputedPayment.md
 docs/DisputesApi.md
 docs/EcomVisibility.md
+docs/ElectronicMoneyDetails.md
 docs/Employee.md
 docs/EmployeeStatus.md
 docs/EmployeeWage.md
@@ -569,6 +580,8 @@ docs/EventTypeMetadata.md
 docs/EventsApi.md
 docs/ExcludeStrategy.md
 docs/ExternalPaymentDetails.md
+docs/FelicaDetails.md
+docs/FelicaDetailsFelicaBrand.md
 docs/FilterValue.md
 docs/FloatNumberRange.md
 docs/Fulfillment.md
@@ -576,6 +589,7 @@ docs/FulfillmentDeliveryDetails.md
 docs/FulfillmentDeliveryDetailsOrderFulfillmentDeliveryDetailsScheduleType.md
 docs/FulfillmentFulfillmentEntry.md
 docs/FulfillmentFulfillmentLineItemApplication.md
+docs/FulfillmentInStoreDetails.md
 docs/FulfillmentPickupDetails.md
 docs/FulfillmentPickupDetailsCurbsidePickupDetails.md
 docs/FulfillmentPickupDetailsScheduleType.md
@@ -648,6 +662,10 @@ docs/GiftCardUpdatedEventObject.md
 docs/GiftCardsApi.md
 docs/InventoryAdjustment.md
 docs/InventoryAdjustmentGroup.md
+docs/InventoryAdjustmentReason.md
+docs/InventoryAdjustmentReasonDirection.md
+docs/InventoryAdjustmentReasonId.md
+docs/InventoryAdjustmentReasonIdType.md
 docs/InventoryAlertType.md
 docs/InventoryApi.md
 docs/InventoryChange.md
@@ -658,7 +676,6 @@ docs/InventoryCountUpdatedEventData.md
 docs/InventoryCountUpdatedEventObject.md
 docs/InventoryPhysicalCount.md
 docs/InventoryState.md
-docs/InventoryTransfer.md
 docs/Invoice.md
 docs/InvoiceAcceptedPaymentMethods.md
 docs/InvoiceAttachment.md
@@ -740,6 +757,7 @@ docs/LaborTimecardDeletedEventData.md
 docs/LaborTimecardUpdatedEvent.md
 docs/LaborTimecardUpdatedEventData.md
 docs/LaborTimecardUpdatedEventObject.md
+docs/LightningDetails.md
 docs/LinkCustomerToGiftCardRequest.md
 docs/LinkCustomerToGiftCardResponse.md
 docs/ListBankAccountsResponse.md
@@ -767,6 +785,7 @@ docs/ListEmployeesResponse.md
 docs/ListEventTypesResponse.md
 docs/ListGiftCardActivitiesResponse.md
 docs/ListGiftCardsResponse.md
+docs/ListInventoryAdjustmentReasonsResponse.md
 docs/ListInvoicesResponse.md
 docs/ListJobsResponse.md
 docs/ListLocationBookingProfilesResponse.md
@@ -915,7 +934,6 @@ docs/MerchantSettingsUpdatedEventData.md
 docs/MerchantSettingsUpdatedEventObject.md
 docs/MerchantStatus.md
 docs/MerchantsApi.md
-docs/MobileAuthorizationApi.md
 docs/ModifierLocationOverrides.md
 docs/Money.md
 docs/OAuthApi.md
@@ -928,6 +946,7 @@ docs/ObtainTokenRequest.md
 docs/ObtainTokenResponse.md
 docs/OfflinePaymentDetails.md
 docs/Order.md
+docs/OrderCardSurchargeTreatmentType.md
 docs/OrderCreated.md
 docs/OrderCreatedEvent.md
 docs/OrderCreatedEventData.md
@@ -965,6 +984,7 @@ docs/OrderLineItemItemType.md
 docs/OrderLineItemModifier.md
 docs/OrderLineItemPricingBlocklists.md
 docs/OrderLineItemPricingBlocklistsBlockedDiscount.md
+docs/OrderLineItemPricingBlocklistsBlockedServiceCharge.md
 docs/OrderLineItemPricingBlocklistsBlockedTax.md
 docs/OrderLineItemTax.md
 docs/OrderLineItemTaxScope.md
@@ -1086,6 +1106,8 @@ docs/RegisterDomainRequest.md
 docs/RegisterDomainResponse.md
 docs/RegisterDomainResponseStatus.md
 docs/RemoveGroupFromCustomerResponse.md
+docs/RestoreInventoryAdjustmentReasonRequest.md
+docs/RestoreInventoryAdjustmentReasonResponse.md
 docs/ResumeSubscriptionRequest.md
 docs/ResumeSubscriptionResponse.md
 docs/RetrieveBookingCustomAttributeDefinitionResponse.md
@@ -1109,11 +1131,12 @@ docs/RetrieveGiftCardFromGanResponse.md
 docs/RetrieveGiftCardFromNonceRequest.md
 docs/RetrieveGiftCardFromNonceResponse.md
 docs/RetrieveGiftCardResponse.md
+docs/RetrieveInventoryAdjustmentReasonRequest.md
+docs/RetrieveInventoryAdjustmentReasonResponse.md
 docs/RetrieveInventoryAdjustmentResponse.md
 docs/RetrieveInventoryChangesResponse.md
 docs/RetrieveInventoryCountResponse.md
 docs/RetrieveInventoryPhysicalCountResponse.md
-docs/RetrieveInventoryTransferResponse.md
 docs/RetrieveJobResponse.md
 docs/RetrieveLocationBookingProfileResponse.md
 docs/RetrieveLocationCustomAttributeDefinitionResponse.md
@@ -1393,6 +1416,10 @@ docs/UpdateCustomerGroupRequest.md
 docs/UpdateCustomerGroupResponse.md
 docs/UpdateCustomerRequest.md
 docs/UpdateCustomerResponse.md
+docs/UpdateInventoryAdjustmentReasonRequest.md
+docs/UpdateInventoryAdjustmentReasonResponse.md
+docs/UpdateInventoryAdjustmentRequest.md
+docs/UpdateInventoryAdjustmentResponse.md
 docs/UpdateInvoiceRequest.md
 docs/UpdateInvoiceResponse.md
 docs/UpdateItemModifierListsRequest.md
@@ -1516,7 +1543,6 @@ src/apis/locations_api.rs
 src/apis/loyalty_api.rs
 src/apis/merchant_custom_attributes_api.rs
 src/apis/merchants_api.rs
-src/apis/mobile_authorization_api.rs
 src/apis/mod.rs
 src/apis/o_auth_api.rs
 src/apis/order_custom_attributes_api.rs
@@ -1574,6 +1600,8 @@ src/models/batch_retrieve_catalog_objects_request.rs
 src/models/batch_retrieve_catalog_objects_response.rs
 src/models/batch_retrieve_inventory_changes_request.rs
 src/models/batch_retrieve_inventory_changes_response.rs
+src/models/batch_retrieve_inventory_changes_sort.rs
+src/models/batch_retrieve_inventory_changes_sort_field.rs
 src/models/batch_retrieve_inventory_counts_request.rs
 src/models/batch_retrieve_inventory_counts_response.rs
 src/models/batch_retrieve_orders_request.rs
@@ -1718,6 +1746,7 @@ src/models/card_issuer_alert.rs
 src/models/card_payment_details.rs
 src/models/card_payment_timeline.rs
 src/models/card_prepaid_type.rs
+src/models/card_surcharge_details.rs
 src/models/card_type.rs
 src/models/card_updated_event.rs
 src/models/card_updated_event_data.rs
@@ -1764,12 +1793,14 @@ src/models/catalog_item_option_value.rs
 src/models/catalog_item_option_value_for_item_variation.rs
 src/models/catalog_item_product_type.rs
 src/models/catalog_item_variation.rs
+src/models/catalog_item_variation_vendor_information.rs
 src/models/catalog_measurement_unit.rs
 src/models/catalog_modifier.rs
 src/models/catalog_modifier_list.rs
 src/models/catalog_modifier_list_modifier_type.rs
 src/models/catalog_modifier_list_selection_type.rs
 src/models/catalog_modifier_override.rs
+src/models/catalog_modifier_toggle_override_type.rs
 src/models/catalog_object.rs
 src/models/catalog_object_batch.rs
 src/models/catalog_object_category.rs
@@ -1837,6 +1868,8 @@ src/models/confirmation_decision.rs
 src/models/confirmation_options.rs
 src/models/coordinates.rs
 src/models/country.rs
+src/models/create_bank_account_request.rs
+src/models/create_bank_account_response.rs
 src/models/create_booking_custom_attribute_definition_request.rs
 src/models/create_booking_custom_attribute_definition_response.rs
 src/models/create_booking_request.rs
@@ -1867,6 +1900,8 @@ src/models/create_gift_card_activity_request.rs
 src/models/create_gift_card_activity_response.rs
 src/models/create_gift_card_request.rs
 src/models/create_gift_card_response.rs
+src/models/create_inventory_adjustment_reason_request.rs
+src/models/create_inventory_adjustment_reason_response.rs
 src/models/create_invoice_attachment_request.rs
 src/models/create_invoice_attachment_response.rs
 src/models/create_invoice_request.rs
@@ -1885,8 +1920,6 @@ src/models/create_loyalty_reward_request.rs
 src/models/create_loyalty_reward_response.rs
 src/models/create_merchant_custom_attribute_definition_request.rs
 src/models/create_merchant_custom_attribute_definition_response.rs
-src/models/create_mobile_authorization_code_request.rs
-src/models/create_mobile_authorization_code_response.rs
 src/models/create_order_custom_attribute_definition_request.rs
 src/models/create_order_custom_attribute_definition_response.rs
 src/models/create_order_request.rs
@@ -1994,6 +2027,8 @@ src/models/delete_customer_custom_attribute_response.rs
 src/models/delete_customer_group_response.rs
 src/models/delete_customer_response.rs
 src/models/delete_dispute_evidence_response.rs
+src/models/delete_inventory_adjustment_reason_request.rs
+src/models/delete_inventory_adjustment_reason_response.rs
 src/models/delete_invoice_attachment_response.rs
 src/models/delete_invoice_response.rs
 src/models/delete_location_custom_attribute_definition_response.rs
@@ -2040,6 +2075,7 @@ src/models/device_metadata.rs
 src/models/device_status.rs
 src/models/device_status_category.rs
 src/models/digital_wallet_details.rs
+src/models/disable_bank_account_response.rs
 src/models/disable_card_response.rs
 src/models/disable_events_response.rs
 src/models/dismiss_terminal_action_response.rs
@@ -2074,6 +2110,7 @@ src/models/dispute_state_updated_event_data.rs
 src/models/dispute_state_updated_event_object.rs
 src/models/disputed_payment.rs
 src/models/ecom_visibility.rs
+src/models/electronic_money_details.rs
 src/models/employee.rs
 src/models/employee_status.rs
 src/models/employee_wage.rs
@@ -2087,6 +2124,8 @@ src/models/event_metadata.rs
 src/models/event_type_metadata.rs
 src/models/exclude_strategy.rs
 src/models/external_payment_details.rs
+src/models/felica_details.rs
+src/models/felica_details_felica_brand.rs
 src/models/filter_value.rs
 src/models/float_number_range.rs
 src/models/fulfillment.rs
@@ -2094,6 +2133,7 @@ src/models/fulfillment_delivery_details.rs
 src/models/fulfillment_delivery_details_order_fulfillment_delivery_details_schedule_type.rs
 src/models/fulfillment_fulfillment_entry.rs
 src/models/fulfillment_fulfillment_line_item_application.rs
+src/models/fulfillment_in_store_details.rs
 src/models/fulfillment_pickup_details.rs
 src/models/fulfillment_pickup_details_curbside_pickup_details.rs
 src/models/fulfillment_pickup_details_schedule_type.rs
@@ -2164,6 +2204,10 @@ src/models/gift_card_updated_event_data.rs
 src/models/gift_card_updated_event_object.rs
 src/models/inventory_adjustment.rs
 src/models/inventory_adjustment_group.rs
+src/models/inventory_adjustment_reason.rs
+src/models/inventory_adjustment_reason_direction.rs
+src/models/inventory_adjustment_reason_id.rs
+src/models/inventory_adjustment_reason_id_type.rs
 src/models/inventory_alert_type.rs
 src/models/inventory_change.rs
 src/models/inventory_change_type.rs
@@ -2173,7 +2217,6 @@ src/models/inventory_count_updated_event_data.rs
 src/models/inventory_count_updated_event_object.rs
 src/models/inventory_physical_count.rs
 src/models/inventory_state.rs
-src/models/inventory_transfer.rs
 src/models/invoice.rs
 src/models/invoice_accepted_payment_methods.rs
 src/models/invoice_attachment.rs
@@ -2253,6 +2296,7 @@ src/models/labor_timecard_deleted_event_data.rs
 src/models/labor_timecard_updated_event.rs
 src/models/labor_timecard_updated_event_data.rs
 src/models/labor_timecard_updated_event_object.rs
+src/models/lightning_details.rs
 src/models/link_customer_to_gift_card_request.rs
 src/models/link_customer_to_gift_card_response.rs
 src/models/list_bank_accounts_response.rs
@@ -2280,6 +2324,7 @@ src/models/list_employees_response.rs
 src/models/list_event_types_response.rs
 src/models/list_gift_card_activities_response.rs
 src/models/list_gift_cards_response.rs
+src/models/list_inventory_adjustment_reasons_response.rs
 src/models/list_invoices_response.rs
 src/models/list_jobs_response.rs
 src/models/list_location_booking_profiles_response.rs
@@ -2436,6 +2481,7 @@ src/models/obtain_token_request.rs
 src/models/obtain_token_response.rs
 src/models/offline_payment_details.rs
 src/models/order.rs
+src/models/order_card_surcharge_treatment_type.rs
 src/models/order_created.rs
 src/models/order_created_event.rs
 src/models/order_created_event_data.rs
@@ -2472,6 +2518,7 @@ src/models/order_line_item_item_type.rs
 src/models/order_line_item_modifier.rs
 src/models/order_line_item_pricing_blocklists.rs
 src/models/order_line_item_pricing_blocklists_blocked_discount.rs
+src/models/order_line_item_pricing_blocklists_blocked_service_charge.rs
 src/models/order_line_item_pricing_blocklists_blocked_tax.rs
 src/models/order_line_item_tax.rs
 src/models/order_line_item_tax_scope.rs
@@ -2589,6 +2636,8 @@ src/models/register_domain_request.rs
 src/models/register_domain_response.rs
 src/models/register_domain_response_status.rs
 src/models/remove_group_from_customer_response.rs
+src/models/restore_inventory_adjustment_reason_request.rs
+src/models/restore_inventory_adjustment_reason_response.rs
 src/models/resume_subscription_request.rs
 src/models/resume_subscription_response.rs
 src/models/retrieve_booking_custom_attribute_definition_response.rs
@@ -2612,11 +2661,12 @@ src/models/retrieve_gift_card_from_gan_response.rs
 src/models/retrieve_gift_card_from_nonce_request.rs
 src/models/retrieve_gift_card_from_nonce_response.rs
 src/models/retrieve_gift_card_response.rs
+src/models/retrieve_inventory_adjustment_reason_request.rs
+src/models/retrieve_inventory_adjustment_reason_response.rs
 src/models/retrieve_inventory_adjustment_response.rs
 src/models/retrieve_inventory_changes_response.rs
 src/models/retrieve_inventory_count_response.rs
 src/models/retrieve_inventory_physical_count_response.rs
-src/models/retrieve_inventory_transfer_response.rs
 src/models/retrieve_job_response.rs
 src/models/retrieve_location_booking_profile_response.rs
 src/models/retrieve_location_custom_attribute_definition_response.rs
@@ -2889,6 +2939,10 @@ src/models/update_customer_group_request.rs
 src/models/update_customer_group_response.rs
 src/models/update_customer_request.rs
 src/models/update_customer_response.rs
+src/models/update_inventory_adjustment_reason_request.rs
+src/models/update_inventory_adjustment_reason_response.rs
+src/models/update_inventory_adjustment_request.rs
+src/models/update_inventory_adjustment_response.rs
 src/models/update_invoice_request.rs
 src/models/update_invoice_response.rs
 src/models/update_item_modifier_lists_request.rs

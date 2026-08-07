@@ -48,7 +48,10 @@ async fn create_order_for_invoice(
 fn build_invoice(location_id: &str, order_id: &str) -> models::Invoice {
     let mut payment_request = models::InvoicePaymentRequest::new();
     payment_request.request_type = Some(models::InvoiceRequestType::Balance);
-    payment_request.due_date = Some(Some("2026-04-02".to_string()));
+    let due_date = (chrono::Utc::now() + chrono::Duration::days(30))
+        .format("%Y-%m-%d")
+        .to_string();
+    payment_request.due_date = Some(Some(due_date));
 
     let accepted = models::InvoiceAcceptedPaymentMethods {
         card: Some(Some(true)),

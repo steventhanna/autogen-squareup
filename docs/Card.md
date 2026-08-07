@@ -19,6 +19,8 @@ Name | Type | Description | Notes
 **card_type** | Option<[**models::CardType**](CardType.md)> |  | [optional]
 **prepaid_type** | Option<[**models::CardPrepaidType**](CardPrepaidType.md)> |  | [optional]
 **bin** | Option<**String**> | The first six digits of the card number, known as the Bank Identification Number (BIN). Only the Payments API returns this field. | [optional][readonly]
+**created_at** | Option<**String**> | Timestamp for when the card object was created on Square’s servers. In RFC 3339 format, e.g., \"2016-09-04T23:59:33.123Z\". | [optional][readonly]
+**disabled_at** | Option<**String**> | Timestamp for when the card object was disabled on Square’s servers. In RFC 3339 format, e.g., \"2016-09-04T23:59:33.123Z\". | [optional][readonly]
 **version** | Option<**i64**> | Current version number of the card. Increments with each card update. Requests to update an existing Card object will be rejected unless the version in the request matches the current version for the Card. | [optional]
 **card_co_brand** | Option<[**models::CardCoBrand**](CardCoBrand.md)> |  | [optional]
 **issuer_alert** | Option<[**models::CardIssuerAlert**](CardIssuerAlert.md)> |  | [optional]

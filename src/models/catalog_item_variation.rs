@@ -36,12 +36,12 @@ pub struct CatalogItemVariation {
     /// Per-location price and inventory overrides.
     #[serde(rename = "location_overrides", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub location_overrides: Option<Option<Vec<models::ItemVariationLocationOverrides>>>,
-    /// If `true`, inventory tracking is active for the variation.
+    /// If `true`, inventory tracking is active for the variation at all locations by default. This value can be overridden for specific locations using `ItemVariationLocationOverrides.track_inventory`. If unset at both levels, inventory tracking is disabled.
     #[serde(rename = "track_inventory", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub track_inventory: Option<Option<bool>>,
     #[serde(rename = "inventory_alert_type", skip_serializing_if = "Option::is_none")]
     pub inventory_alert_type: Option<models::InventoryAlertType>,
-    /// If the inventory quantity for the variation is less than or equal to this value and `inventory_alert_type` is `LOW_QUANTITY`, the variation displays an alert in the merchant dashboard.  This value is always an integer.
+    /// If the inventory quantity for the variation is less than or equal to this value and `inventory_alert_type` is `LOW_QUANTITY`, the variation displays an alert in the merchant dashboard. This value is always an integer.  Deprecated because this field has never been global.
     #[serde(rename = "inventory_alert_threshold", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub inventory_alert_threshold: Option<Option<i64>>,
     /// Arbitrary user metadata to associate with the item variation. This attribute value length is of Unicode code points.
@@ -73,6 +73,12 @@ pub struct CatalogItemVariation {
     pub team_member_ids: Option<Option<Vec<String>>>,
     #[serde(rename = "stockable_conversion", skip_serializing_if = "Option::is_none")]
     pub stockable_conversion: Option<Box<models::CatalogStockConversion>>,
+    /// (Optional) Name that the restaurant wants to display to their kitchen workers instead of the customer-facing name. e.g., customer name might be \"Mega-Jumbo Triplesized\" and the kitchen name is \"Large container\"
+    #[serde(rename = "kitchen_name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub kitchen_name: Option<Option<String>>,
+    /// Details of the vendor this product is purchased from. This field can be set only if the seller has an active subscription to either Square for Retail Premium or Square for Restaurants Premium.
+    #[serde(rename = "vendor_information", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub vendor_information: Option<Option<Vec<models::CatalogItemVariationVendorInformation>>>,
 }
 
 impl CatalogItemVariation {
@@ -100,6 +106,8 @@ impl CatalogItemVariation {
             image_ids: None,
             team_member_ids: None,
             stockable_conversion: None,
+            kitchen_name: None,
+            vendor_information: None,
         }
     }
 }

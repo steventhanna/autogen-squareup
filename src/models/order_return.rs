@@ -27,11 +27,11 @@ pub struct OrderReturn {
     #[serde(rename = "return_service_charges", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub return_service_charges: Option<Option<Vec<models::OrderReturnServiceCharge>>>,
     /// A collection of references to taxes being returned for an order, including the total applied tax amount to be returned. The taxes must reference a top-level tax ID from the source order.
-    #[serde(rename = "return_taxes", skip_serializing_if = "Option::is_none")]
-    pub return_taxes: Option<Vec<models::OrderReturnTax>>,
+    #[serde(rename = "return_taxes", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub return_taxes: Option<Option<Vec<models::OrderReturnTax>>>,
     /// A collection of references to discounts being returned for an order, including the total applied discount amount to be returned. The discounts must reference a top-level discount ID from the source order.
-    #[serde(rename = "return_discounts", skip_serializing_if = "Option::is_none")]
-    pub return_discounts: Option<Vec<models::OrderReturnDiscount>>,
+    #[serde(rename = "return_discounts", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub return_discounts: Option<Option<Vec<models::OrderReturnDiscount>>>,
     /// A collection of references to tips being returned for an order.
     #[serde(rename = "return_tips", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub return_tips: Option<Option<Vec<models::OrderReturnTip>>>,

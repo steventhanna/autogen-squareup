@@ -20,6 +20,8 @@ Name | Type | Description | Notes
 **card_payment_timeline** | Option<[**models::CardPaymentTimeline**](CardPaymentTimeline.md)> |  | [optional]
 **refund_requires_card_presence** | Option<**bool**> | Whether the card must be physically present for the payment to be refunded.  If set to `true`, the card must be present. | [optional][readonly]
 **errors** | Option<[**Vec<models::Error>**](Error.md)> | Information about errors encountered during the request. | [optional][readonly]
+**applied_card_surcharge_details** | Option<[**models::CardSurchargeDetails**](CardSurchargeDetails.md)> |  | [optional]
+**wallet_type** | Option<**String**> | The type of digital wallet used for this card payment, if applicable. Currently only populated for in-person Apple Pay payments. Detection has no false positives but may have false negatives (some Apple Pay payments may not be detected).  For payments with `source_type` of `WALLET`, see `DigitalWalletDetails` instead.  Values: `APPLE_PAY` | [optional][readonly]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

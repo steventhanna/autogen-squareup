@@ -22,6 +22,9 @@ pub struct OrderLineItemAppliedTax {
     pub tax_uid: String,
     #[serde(rename = "applied_money", skip_serializing_if = "Option::is_none")]
     pub applied_money: Option<Box<models::Money>>,
+    /// Indicates whether the tax was automatically applied to the order based on the catalog configuration. For an example, see [Automatically Apply Taxes to an Order](https://developer.squareup.com/docs/orders-api/apply-taxes-and-discounts/auto-apply-taxes).
+    #[serde(rename = "auto_applied", skip_serializing_if = "Option::is_none")]
+    pub auto_applied: Option<bool>,
 }
 
 impl OrderLineItemAppliedTax {
@@ -31,6 +34,7 @@ impl OrderLineItemAppliedTax {
             uid: None,
             tax_uid,
             applied_money: None,
+            auto_applied: None,
         }
     }
 }

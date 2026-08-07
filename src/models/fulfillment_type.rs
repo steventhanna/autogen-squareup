@@ -21,6 +21,8 @@ pub enum FulfillmentType {
     Shipment,
     #[serde(rename = "DELIVERY")]
     Delivery,
+    #[serde(rename = "IN_STORE")]
+    InStore,
 
 }
 
@@ -30,6 +32,7 @@ impl std::fmt::Display for FulfillmentType {
             Self::Pickup => write!(f, "PICKUP"),
             Self::Shipment => write!(f, "SHIPMENT"),
             Self::Delivery => write!(f, "DELIVERY"),
+            Self::InStore => write!(f, "IN_STORE"),
         }
     }
 }

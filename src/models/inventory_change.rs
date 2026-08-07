@@ -20,8 +20,6 @@ pub struct InventoryChange {
     pub physical_count: Option<Box<models::InventoryPhysicalCount>>,
     #[serde(rename = "adjustment", skip_serializing_if = "Option::is_none")]
     pub adjustment: Option<Box<models::InventoryAdjustment>>,
-    #[serde(rename = "transfer", skip_serializing_if = "Option::is_none")]
-    pub transfer: Option<Box<models::InventoryTransfer>>,
     #[serde(rename = "measurement_unit", skip_serializing_if = "Option::is_none")]
     pub measurement_unit: Option<Box<models::CatalogMeasurementUnit>>,
     /// The ID of the [CatalogMeasurementUnit](entity:CatalogMeasurementUnit) object representing the catalog measurement unit associated with the inventory change.
@@ -36,7 +34,6 @@ impl InventoryChange {
             r#type: None,
             physical_count: None,
             adjustment: None,
-            transfer: None,
             measurement_unit: None,
             measurement_unit_id: None,
         }

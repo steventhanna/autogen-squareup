@@ -94,7 +94,55 @@ impl Default for CatalogModifierToggleOverrideType {
 }
 TYPEEOF
 
-# Fix 5: Re-apply feature gates to apis/mod.rs
+# Fix 5: AppFeeAllocation and CurrencyExchange are referenced by the spec but
+# never defined (as of the 2026-07-15 release). Square's own SDKs type these
+# fields as `unknown`, so fall back to serde_json::Value.
+echo "    Replacing undefined AppFeeAllocation/CurrencyExchange with serde_json::Value..."
+UNDEFINED_TYPE_FILES=$(grep -Erl 'models::(AppFeeAllocation|CurrencyExchange)' src/models || true)
+if [ -n "$UNDEFINED_TYPE_FILES" ]; then
+  sedi 's/models::AppFeeAllocation/serde_json::Value/g; s/models::CurrencyExchange/serde_json::Value/g' $UNDEFINED_TYPE_FILES
+fi
+
+# Fix 6: ErrorCode enum is missing codes the live API returns. Square's spec
+# omits some codes from the ErrorCode enum definition even though the API
+# returns them (e.g. ISSUER_INSTALLMENT_ERROR appears only in an
+# x-endpoint-errors vendor extension on POST /v2/payments). Without a
+# catch-all, one undocumented code fails deserialization of the entire
+# response. Guarded by tests/error_code_test.rs.
+echo "    Patching ErrorCode enum (missing codes + serde(other) catch-all)..."
+python3 - <<'PYEOF'
+path = "src/models/error_code.rs"
+src = open(path).read()
+
+variants = ""
+if '"ISSUER_INSTALLMENT_ERROR"' not in src:
+    variants += '    #[serde(rename = "ISSUER_INSTALLMENT_ERROR")]\n    IssuerInstallmentError,\n'
+if "serde(other" not in src:
+    variants += (
+        '    /// Catch-all for error codes the published Square spec does not declare.\n'
+        '    #[serde(other, rename = "UNKNOWN")]\n'
+        '    Unknown,\n'
+    )
+if variants:
+    enum_start = src.index("pub enum ErrorCode {")
+    enum_end = src.index("\n}", enum_start) + 1  # position of closing brace line
+    src = src[:enum_end] + variants + src[enum_end:]
+
+arms = ""
+if "Self::IssuerInstallmentError =>" not in src:
+    arms += '            Self::IssuerInstallmentError => write!(f, "ISSUER_INSTALLMENT_ERROR"),\n'
+if "Self::Unknown =>" not in src:
+    arms += '            Self::Unknown => write!(f, "UNKNOWN"),\n'
+if arms:
+    display_start = src.index("impl std::fmt::Display for ErrorCode {")
+    match_start = src.index("match self {", display_start)
+    line_end = src.index("\n", match_start) + 1
+    src = src[:line_end] + arms + src[line_end:]
+
+open(path, "w").write(src)
+PYEOF
+
+# Fix 7: Re-apply feature gates to apis/mod.rs
 echo "    Re-applying feature gates to apis/mod.rs..."
 apply_gate() {
   local mod_name="$1" feature="$2"

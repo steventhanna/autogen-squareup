@@ -61,6 +61,9 @@ pub struct BankAccount {
     /// Read only. Name of actual financial institution.  For example \"Bank of America\".
     #[serde(rename = "bank_name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub bank_name: Option<Option<String>>,
+    /// The ID of the customer who owns the bank account
+    #[serde(rename = "customer_id", skip_serializing_if = "Option::is_none")]
+    pub customer_id: Option<String>,
 }
 
 impl BankAccount {
@@ -84,6 +87,7 @@ impl BankAccount {
             fingerprint: None,
             version: None,
             bank_name: None,
+            customer_id: None,
         }
     }
 }

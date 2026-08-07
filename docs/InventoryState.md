@@ -20,6 +20,7 @@
 | Decomposed | DECOMPOSED |
 | SupportedByNewerVersion | SUPPORTED_BY_NEWER_VERSION |
 | InTransit | IN_TRANSIT |
+| Untracked | UNTRACKED |
 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

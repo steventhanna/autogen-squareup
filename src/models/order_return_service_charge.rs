@@ -52,6 +52,8 @@ pub struct OrderReturnServiceCharge {
     pub treatment_type: Option<models::OrderServiceChargeTreatmentType>,
     #[serde(rename = "scope", skip_serializing_if = "Option::is_none")]
     pub scope: Option<models::OrderServiceChargeScope>,
+    #[serde(rename = "type", skip_serializing_if = "Option::is_none")]
+    pub r#type: Option<models::OrderServiceChargeType>,
 }
 
 impl OrderReturnServiceCharge {
@@ -73,6 +75,7 @@ impl OrderReturnServiceCharge {
             applied_taxes: None,
             treatment_type: None,
             scope: None,
+            r#type: None,
         }
     }
 }

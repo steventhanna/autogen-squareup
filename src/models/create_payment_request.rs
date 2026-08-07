@@ -26,6 +26,9 @@ pub struct CreatePaymentRequest {
     pub tip_money: Option<Box<models::Money>>,
     #[serde(rename = "app_fee_money", skip_serializing_if = "Option::is_none")]
     pub app_fee_money: Option<Box<models::Money>>,
+    /// Details pertaining to recipients of the application fee. The sum of the amounts in the app_fee_allocations must equal the app_fee_money amount, if present. If populated, an allocation must be present for every party that expects to receive a portion of the application fee, including the application developer.
+    #[serde(rename = "app_fee_allocations", skip_serializing_if = "Option::is_none")]
+    pub app_fee_allocations: Option<Vec<serde_json::Value>>,
     /// The duration of time after the payment's creation when Square automatically either completes or cancels the payment depending on the `delay_action` field value. For more information, see [Time threshold](https://developer.squareup.com/docs/payments-api/take-payments/card-payments/delayed-capture#time-threshold).  This parameter should be specified as a time duration, in RFC 3339 format.  Note: This feature is only supported for card payments. This parameter can only be set for a delayed capture payment (`autocomplete=false`).  Default:  - Card-present payments: \"PT36H\" (36 hours) from the creation time. - Card-not-present payments: \"P7D\" (7 days) from the creation time.
     #[serde(rename = "delay_duration", skip_serializing_if = "Option::is_none")]
     pub delay_duration: Option<String>,
@@ -91,6 +94,7 @@ impl CreatePaymentRequest {
             amount_money: None,
             tip_money: None,
             app_fee_money: None,
+            app_fee_allocations: None,
             delay_duration: None,
             delay_action: None,
             autocomplete: None,

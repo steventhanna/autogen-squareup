@@ -116,6 +116,7 @@
 | UnsupportedLoyaltyRewardTier | UNSUPPORTED_LOYALTY_REWARD_TIER |
 | LocationMismatch | LOCATION_MISMATCH |
 | OrderUnpaidNotReturnable | ORDER_UNPAID_NOT_RETURNABLE |
+| PartialPaymentDelayCaptureNotSupported | PARTIAL_PAYMENT_DELAY_CAPTURE_NOT_SUPPORTED |
 | IdempotencyKeyReused | IDEMPOTENCY_KEY_REUSED |
 | UnexpectedValue | UNEXPECTED_VALUE |
 | SandboxNotSupported | SANDBOX_NOT_SUPPORTED |
@@ -131,6 +132,7 @@
 | PlaidError | PLAID_ERROR |
 | PlaidErrorItemLoginRequired | PLAID_ERROR_ITEM_LOGIN_REQUIRED |
 | PlaidErrorRateLimit | PLAID_ERROR_RATE_LIMIT |
+| PaymentSourceNotEnabledForTarget | PAYMENT_SOURCE_NOT_ENABLED_FOR_TARGET |
 | CardDeclined | CARD_DECLINED |
 | VerifyCvvFailure | VERIFY_CVV_FAILURE |
 | VerifyAvsFailure | VERIFY_AVS_FAILURE |

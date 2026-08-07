@@ -31,6 +31,9 @@ pub struct Payment {
     pub total_money: Option<Box<models::Money>>,
     #[serde(rename = "app_fee_money", skip_serializing_if = "Option::is_none")]
     pub app_fee_money: Option<Box<models::Money>>,
+    /// Details pertaining to recipients of the application fee.
+    #[serde(rename = "app_fee_allocations", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub app_fee_allocations: Option<Option<Vec<serde_json::Value>>>,
     #[serde(rename = "approved_money", skip_serializing_if = "Option::is_none")]
     pub approved_money: Option<Box<models::Money>>,
     /// The processing fees and fee adjustments assessed by Square for this payment.
@@ -59,6 +62,8 @@ pub struct Payment {
     pub cash_details: Option<Box<models::CashPaymentDetails>>,
     #[serde(rename = "bank_account_details", skip_serializing_if = "Option::is_none")]
     pub bank_account_details: Option<Box<models::BankAccountPaymentDetails>>,
+    #[serde(rename = "electronic_money_details", skip_serializing_if = "Option::is_none")]
+    pub electronic_money_details: Option<Box<models::ElectronicMoneyDetails>>,
     #[serde(rename = "external_details", skip_serializing_if = "Option::is_none")]
     pub external_details: Option<Box<models::ExternalPaymentDetails>>,
     #[serde(rename = "wallet_details", skip_serializing_if = "Option::is_none")]
@@ -119,6 +124,8 @@ pub struct Payment {
     pub device_details: Option<Box<models::DeviceDetails>>,
     #[serde(rename = "application_details", skip_serializing_if = "Option::is_none")]
     pub application_details: Option<Box<models::ApplicationDetails>>,
+    #[serde(rename = "buyer_currency_exchange", skip_serializing_if = "Option::is_none")]
+    pub buyer_currency_exchange: Option<serde_json::Value>,
     /// Whether or not this payment was taken offline.
     #[serde(rename = "is_offline_payment", skip_serializing_if = "Option::is_none")]
     pub is_offline_payment: Option<bool>,
@@ -140,6 +147,7 @@ impl Payment {
             tip_money: None,
             total_money: None,
             app_fee_money: None,
+            app_fee_allocations: None,
             approved_money: None,
             processing_fee: None,
             refunded_money: None,
@@ -151,6 +159,7 @@ impl Payment {
             card_details: None,
             cash_details: None,
             bank_account_details: None,
+            electronic_money_details: None,
             external_details: None,
             wallet_details: None,
             buy_now_pay_later_details: None,
@@ -174,6 +183,7 @@ impl Payment {
             receipt_url: None,
             device_details: None,
             application_details: None,
+            buyer_currency_exchange: None,
             is_offline_payment: None,
             offline_payment_details: None,
             version_token: None,

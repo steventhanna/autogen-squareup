@@ -113,6 +113,12 @@ jobs:
               echo "pub mod catalog_modifier_toggle_override_type;" >> src/models/mod.rs
               echo "pub use self::catalog_modifier_toggle_override_type::CatalogModifierToggleOverrideType;" >> src/models/mod.rs
             fi
+
+            # AppFeeAllocation/CurrencyExchange referenced but never defined in spec
+            UNDEFINED_TYPE_FILES=$(grep -Erl "models::(AppFeeAllocation|CurrencyExchange)" src/models || true)
+            if [ -n "$UNDEFINED_TYPE_FILES" ]; then
+              sed -i "s/models::AppFeeAllocation/serde_json::Value/g; s/models::CurrencyExchange/serde_json::Value/g" $UNDEFINED_TYPE_FILES
+            fi
           '
 
           # Re-create the missing type if it was overwritten
@@ -144,6 +150,44 @@ jobs:
               }
           }
           TYPEEOF
+
+      - name: Patch ErrorCode enum (missing codes + catch-all)
+        if: steps.version.outputs.changed == 'true' && steps.existing_pr.outputs.exists != 'true'
+        run: |
+          # Square's spec omits some codes from the ErrorCode enum that the
+          # live API returns (e.g. ISSUER_INSTALLMENT_ERROR). Mirror of Fix 6
+          # in generate.sh; guarded by tests/error_code_test.rs.
+          python3 - <<'PYEOF'
+          path = "src/models/error_code.rs"
+          src = open(path).read()
+
+          variants = ""
+          if '"ISSUER_INSTALLMENT_ERROR"' not in src:
+              variants += '    #[serde(rename = "ISSUER_INSTALLMENT_ERROR")]\n    IssuerInstallmentError,\n'
+          if "serde(other" not in src:
+              variants += (
+                  '    /// Catch-all for error codes the published Square spec does not declare.\n'
+                  '    #[serde(other, rename = "UNKNOWN")]\n'
+                  '    Unknown,\n'
+              )
+          if variants:
+              enum_start = src.index("pub enum ErrorCode {")
+              enum_end = src.index("\n}", enum_start) + 1
+              src = src[:enum_end] + variants + src[enum_end:]
+
+          arms = ""
+          if "Self::IssuerInstallmentError =>" not in src:
+              arms += '            Self::IssuerInstallmentError => write!(f, "ISSUER_INSTALLMENT_ERROR"),\n'
+          if "Self::Unknown =>" not in src:
+              arms += '            Self::Unknown => write!(f, "UNKNOWN"),\n'
+          if arms:
+              display_start = src.index("impl std::fmt::Display for ErrorCode {")
+              match_start = src.index("match self {", display_start)
+              line_end = src.index("\n", match_start) + 1
+              src = src[:line_end] + arms + src[line_end:]
+
+          open(path, "w").write(src)
+          PYEOF
 
       - name: Re-apply feature gates
         if: steps.version.outputs.changed == 'true' && steps.existing_pr.outputs.exists != 'true'

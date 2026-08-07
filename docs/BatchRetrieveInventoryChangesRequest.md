@@ -12,6 +12,8 @@ Name | Type | Description | Notes
 **updated_before** | Option<**String**> | The filter to return results with their `created_at` or `calculated_at` value strictly before the given time as specified in an RFC 3339 timestamp. The default value is the UNIX epoch of (`1970-01-01T00:00:00Z`). | [optional]
 **cursor** | Option<**String**> | A pagination cursor returned by a previous call to this endpoint. Provide this to retrieve the next set of results for the original query.  See the [Pagination](https://developer.squareup.com/docs/working-with-apis/pagination) guide for more information. | [optional]
 **limit** | Option<**i32**> | The number of [records](entity:InventoryChange) to return. | [optional]
+**sort** | Option<[**models::BatchRetrieveInventoryChangesSort**](BatchRetrieveInventoryChangesSort.md)> |  | [optional]
+**reason_ids** | Option<[**Vec<models::InventoryAdjustmentReasonId>**](InventoryAdjustmentReasonId.md)> | The filter to return `ADJUSTMENT` query results by inventory adjustment reason. This filter is only applied when set. The request cannot include both `reason_ids` and `states`. | [optional]
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

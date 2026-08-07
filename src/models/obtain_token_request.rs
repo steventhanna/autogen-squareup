@@ -44,6 +44,9 @@ pub struct ObtainTokenRequest {
     /// The secret your application generated for the authorization request used to obtain the authorization code. This is the source of the `code_challenge` hash you provided in your authorization URL.  Required for the PKCE flow if `grant_type` is `authorization_code`.
     #[serde(rename = "code_verifier", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub code_verifier: Option<Option<String>>,
+    /// Indicates whether to use a JWT (JSON Web Token) as the OAuth access token. When set to `true`, the OAuth flow returns a JWT to your application, used in the same way as a regular token. The default value is `false`.
+    #[serde(rename = "use_jwt", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
+    pub use_jwt: Option<Option<bool>>,
 }
 
 impl ObtainTokenRequest {
@@ -60,6 +63,7 @@ impl ObtainTokenRequest {
             scopes: None,
             short_lived: None,
             code_verifier: None,
+            use_jwt: None,
         }
     }
 }

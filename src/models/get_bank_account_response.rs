@@ -14,19 +14,19 @@ use serde::{Deserialize, Serialize};
 /// GetBankAccountResponse : Response object returned by `GetBankAccount`.
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct GetBankAccountResponse {
+    #[serde(rename = "bank_account", skip_serializing_if = "Option::is_none")]
+    pub bank_account: Option<Box<models::BankAccount>>,
     /// Information on errors encountered during the request.
     #[serde(rename = "errors", skip_serializing_if = "Option::is_none")]
     pub errors: Option<Vec<models::Error>>,
-    #[serde(rename = "bank_account", skip_serializing_if = "Option::is_none")]
-    pub bank_account: Option<Box<models::BankAccount>>,
 }
 
 impl GetBankAccountResponse {
     /// Response object returned by `GetBankAccount`.
     pub fn new() -> GetBankAccountResponse {
         GetBankAccountResponse {
-            errors: None,
             bank_account: None,
+            errors: None,
         }
     }
 }

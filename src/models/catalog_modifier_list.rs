@@ -14,7 +14,7 @@ use serde::{Deserialize, Serialize};
 /// CatalogModifierList : A container for a list of modifiers, or a text-based modifier. For text-based modifiers, this represents text configuration for an item. (For example, custom text to print on a t-shirt). For non text-based modifiers, this represents a list of modifiers that can be applied to items at the time of sale. (For example, a list of condiments for a hot dog, or a list of ice cream flavors). Each element of the modifier list is a `CatalogObject` instance of the `MODIFIER` type.
 #[derive(Clone, Default, Debug, PartialEq, Serialize, Deserialize)]
 pub struct CatalogModifierList {
-    /// The name of the `CatalogModifierList` instance. This is a searchable attribute for use in applicable query filters, and its value length is of  Unicode code points.
+    /// The name of the `CatalogModifierList` instance. This is a searchable attribute for use in applicable query filters, and its value length is of Unicode code points.
     #[serde(rename = "name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub name: Option<Option<String>>,
     /// The position of this `CatalogModifierList` within a list of `CatalogModifierList` instances.
@@ -22,7 +22,7 @@ pub struct CatalogModifierList {
     pub ordinal: Option<Option<i32>>,
     #[serde(rename = "selection_type", skip_serializing_if = "Option::is_none")]
     pub selection_type: Option<models::CatalogModifierListSelectionType>,
-    /// A non-empty list of `CatalogModifier` objects to be included in the `CatalogModifierList`,  for non text-based modifiers when the `modifier_type` attribute is `LIST`. Each element of this list  is a `CatalogObject` instance of the `MODIFIER` type, containing the following attributes: ``` { \"id\": \"{{catalog_modifier_id}}\", \"type\": \"MODIFIER\",  \"modifier_data\": {{a CatalogModifier instance>}}  } ```
+    /// A non-empty list of `CatalogModifier` objects to be included in the `CatalogModifierList`, for non text-based modifiers when the `modifier_type` attribute is `LIST`. Each element of this list is a `CatalogObject` instance of the `MODIFIER` type, containing the following attributes: ``` { \"id\": \"{{catalog_modifier_id}}\", \"type\": \"MODIFIER\", \"modifier_data\": {{a CatalogModifier instance>}} } ```
     #[serde(rename = "modifiers", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub modifiers: Option<Option<Vec<models::CatalogObject>>>,
     /// The IDs of images associated with this `CatalogModifierList` instance. Currently these images are not displayed on Square products, but may be displayed in 3rd-party applications.
@@ -36,13 +36,13 @@ pub struct CatalogModifierList {
     pub is_conversational: Option<Option<bool>>,
     #[serde(rename = "modifier_type", skip_serializing_if = "Option::is_none")]
     pub modifier_type: Option<models::CatalogModifierListModifierType>,
-    /// The maximum length, in Unicode points, of the text string of the text-based modifier as represented by  this `CatalogModifierList` object with the `modifier_type` set to `TEXT`.
+    /// The maximum length, in Unicode points, of the text string of the text-based modifier as represented by this `CatalogModifierList` object with the `modifier_type` set to `TEXT`.
     #[serde(rename = "max_length", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub max_length: Option<Option<i32>>,
     /// Whether the text string must be a non-empty string (`true`) or not (`false`) for a text-based modifier as represented by this `CatalogModifierList` object with the `modifier_type` set to `TEXT`.
     #[serde(rename = "text_required", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub text_required: Option<Option<bool>>,
-    /// A note for internal use by the business.     For example, for a text-based modifier applied to a T-shirt item, if the buyer-supplied text of \"Hello, Kitty!\"   is to be printed on the T-shirt, this `internal_name` attribute can be \"Use italic face\" as  an instruction for the business to follow.    For non text-based modifiers, this `internal_name` attribute can be  used to include SKUs, internal codes, or supplemental descriptions for internal use.
+    /// A note for internal use by the business.  For example, for a text-based modifier applied to a T-shirt item, if the buyer-supplied text of \"Hello, Kitty!\" is to be printed on the T-shirt, this `internal_name` attribute can be \"Use italic face\" as an instruction for the business to follow.  For non text-based modifiers, this `internal_name` attribute can be used to include SKUs, internal codes, or supplemental descriptions for internal use.
     #[serde(rename = "internal_name", default, with = "::serde_with::rust::double_option", skip_serializing_if = "Option::is_none")]
     pub internal_name: Option<Option<String>>,
     /// The minimum number of modifiers that must be selected from this list. The value can be overridden with `CatalogItemModifierListInfo`.  Values:  - 0: No selection is required. - -1: Default value, the attribute was not set by the client. Treated as no selection required. - &gt;0: The required minimum modifier selections. This can be larger than the total `CatalogModifiers` when `allow_quantities` is enabled. - &lt; -1: Invalid. Treated as no selection required.
