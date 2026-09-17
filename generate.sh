@@ -10,7 +10,7 @@ sedi() {
   fi
 }
 
-SPEC_URL="https://raw.githubusercontent.com/square/connect-api-specification/master/api.json"
+SPEC_URL="${SPEC_URL:-https://raw.githubusercontent.com/square/connect-api-specification/master/api.json}"
 
 echo "==> Fetching Square OpenAPI spec..."
 curl -sS -o api.json "$SPEC_URL"
@@ -22,7 +22,7 @@ openapi-generator generate \
   -g rust \
   --library reqwest \
   --skip-validate-spec \
-  --additional-properties=packageName=autogen-squareup,supportAsync=true \
+  --additional-properties=packageName=autogen-squareup,supportAsync=true,supportMiddleware=true \
   -o . \
   2>&1 | tail -5
 

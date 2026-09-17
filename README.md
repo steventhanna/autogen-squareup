@@ -8,7 +8,7 @@ Generated from the [official Square OpenAPI spec](https://github.com/square/conn
 
 ```toml
 [dependencies]
-autogen-squareup = "0.1"
+autogen-squareup = "0.20260715"
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 ```
 
@@ -16,7 +16,7 @@ To use only specific API groups (reduces compile time):
 
 ```toml
 [dependencies]
-autogen-squareup = { version = "0.1", default-features = false, features = ["payments", "customers", "native-tls"] }
+autogen-squareup = { version = "0.20260715", default-features = false, features = ["payments", "customers", "native-tls"] }
 ```
 
 ## Quick Start
@@ -55,6 +55,29 @@ let client = SquareClient::sandbox("sandbox-sq0atp-...");
 use autogen_squareup::Environment;
 let client = SquareClient::with_env("sq0atp-...", Environment::Production);
 ```
+
+## Middleware
+
+Every generated `Configuration.client` is a `reqwest_middleware::ClientWithMiddleware`. Version
+0.20260715.1 changed `Configuration.client` from `reqwest::Client` to `ClientWithMiddleware` and
+added an `Error::ReqwestMiddleware` variant, which is breaking if you constructed `Configuration`
+by hand or matched exhaustively on `apis::Error`. The same release moved to reqwest 0.13 /
+reqwest-middleware 0.5 (pair it with reqwest-tracing 0.7).
+
+Use `SquareClient::builder` to attach middleware, for example a tracing middleware:
+
+```rust
+use autogen_squareup::{SquareClient, Environment};
+
+let client = SquareClient::builder("sq0atp-...")
+    .environment(Environment::Sandbox)
+    .with(my_middleware)
+    .build();
+```
+
+`autogen_squareup::reqwest_middleware` is re-exported, so you can build middleware against the
+same version this crate links without adding your own dependency. This crate emits no spans and
+has no opentelemetry dependency; it only routes requests through whatever middleware you attach.
 
 ## Usage Examples
 
