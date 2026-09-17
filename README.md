@@ -61,7 +61,8 @@ let client = SquareClient::with_env("sq0atp-...", Environment::Production);
 Every generated `Configuration.client` is a `reqwest_middleware::ClientWithMiddleware`. Version
 0.20260715.1 changed `Configuration.client` from `reqwest::Client` to `ClientWithMiddleware` and
 added an `Error::ReqwestMiddleware` variant, which is breaking if you constructed `Configuration`
-by hand or matched exhaustively on `apis::Error`.
+by hand or matched exhaustively on `apis::Error`. The same release moved to reqwest 0.13 /
+reqwest-middleware 0.5 (pair it with reqwest-tracing 0.7).
 
 Use `SquareClient::builder` to attach middleware, for example a tracing middleware:
 
