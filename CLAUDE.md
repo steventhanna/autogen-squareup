@@ -52,14 +52,14 @@ These fixes are reapplied every regeneration — if you encounter a new generato
 
 ### Hand-Written Code
 
-- **`src/client.rs`** — `SquareClient` wrapper: sets Bearer token via `oauth_access_token`, base URL per environment (production `connect.squareup.com/v2`, sandbox `connect.squareupsandbox.com/v2`), and user-agent header
-- **`src/lib.rs`** — re-exports `SquareClient`, `Environment`, and the `apis`/`models` modules
+- **`src/client.rs`** — `SquareClient` wrapper: sets Bearer token via `oauth_access_token`, base URL per environment (production `connect.squareup.com/v2`, sandbox `connect.squareupsandbox.com/v2`), and user-agent header. `SquareClientBuilder` (via `SquareClient::builder`) attaches `reqwest_middleware` middleware (e.g. a tracing middleware) to the underlying `ClientWithMiddleware`; the crate itself emits no spans and has no opentelemetry dependency.
+- **`src/lib.rs`** — re-exports `SquareClient`, `SquareClientBuilder`, `Environment`, `reqwest_middleware`, and the `apis`/`models` modules
 
 ### Generated Code (do not edit directly)
 
 - **`src/apis/`** — 44 API modules, one per Square API group, each feature-gated in `src/apis/mod.rs`. Plus `configuration.rs` (always compiled) and shared error/utility types in `mod.rs`
 - **`src/models/`** — ~1448 model files. Models are NOT feature-gated (cross-referencing is too complex)
-- **`src/apis/configuration.rs`** — `Configuration` struct with `base_path`, auth fields, and `reqwest::Client`
+- **`src/apis/configuration.rs`** — `Configuration` struct with `base_path`, auth fields, and `reqwest_middleware::ClientWithMiddleware` (generated via `supportMiddleware=true` in the generation pipeline)
 
 ### Feature Flags
 
@@ -80,5 +80,5 @@ Crate version follows the Square API spec date: `0.YYYYMMDD.0` (e.g., `0.2025101
 
 - **Never hand-edit generated files** in `src/apis/` or `src/models/`. Fix bugs in `generate.sh` post-processing instead, then re-run `./generate.sh`.
 - When adding a new post-generation fix, add it to `generate.sh` AND replicate it in `.github/workflows/update-spec.yml` (the CI workflow runs its own inline generation).
-- Tests live in `tests/`. Only the client wrapper has tests — generated API methods aren't unit-tested (they require a live Square account).
+- Tests live in `tests/`. The client wrapper and the middleware chain (`tests/middleware_test.rs`, against a wiremock server) have tests — generated API methods aren't unit-tested beyond that (they require a live Square account).
 - After any multi-file change, run `cargo check --all-features` to verify.

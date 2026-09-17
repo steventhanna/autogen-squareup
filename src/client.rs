@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 use crate::apis::configuration::Configuration;
 
 /// Derive the Square API version from the crate version.
@@ -52,7 +54,62 @@ impl SquareClient {
 
     /// Create a client with a specific environment.
     pub fn with_env(access_token: &str, env: Environment) -> Self {
-        // Derive the Square API version from the crate version (0.YYYYMMDD.0 → YYYY-MM-DD).
+        Self::builder(access_token).environment(env).build()
+    }
+
+    /// Start building a client with a custom middleware chain.
+    pub fn builder(access_token: impl Into<String>) -> SquareClientBuilder {
+        SquareClientBuilder {
+            access_token: access_token.into(),
+            environment: Environment::Production,
+            middleware: Vec::new(),
+        }
+    }
+
+    /// Access the underlying configuration for use with generated API functions.
+    pub fn config(&self) -> &Configuration {
+        &self.configuration
+    }
+}
+
+/// Builder for [`SquareClient`] that allows attaching `reqwest_middleware` middleware
+/// (for example a tracing middleware installed by the application).
+pub struct SquareClientBuilder {
+    access_token: String,
+    environment: Environment,
+    middleware: Vec<Arc<dyn reqwest_middleware::Middleware>>,
+}
+
+impl std::fmt::Debug for SquareClientBuilder {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("SquareClientBuilder")
+            .field("environment", &self.environment)
+            .field("middleware_count", &self.middleware.len())
+            .finish()
+    }
+}
+
+impl SquareClientBuilder {
+    /// Set the target environment. Default is [`Environment::Production`].
+    pub fn environment(mut self, env: Environment) -> Self {
+        self.environment = env;
+        self
+    }
+
+    /// Append a middleware to the chain (order preserved).
+    pub fn with<M: reqwest_middleware::Middleware>(mut self, middleware: M) -> Self {
+        self.middleware.push(Arc::new(middleware));
+        self
+    }
+
+    /// Append a middleware to the chain via an existing `Arc` (order preserved).
+    pub fn with_arc(mut self, middleware: Arc<dyn reqwest_middleware::Middleware>) -> Self {
+        self.middleware.push(middleware);
+        self
+    }
+
+    /// Build the [`SquareClient`], applying all attached middleware.
+    pub fn build(self) -> SquareClient {
         let api_version = square_api_version();
 
         let mut headers = reqwest::header::HeaderMap::new();
@@ -67,16 +124,16 @@ impl SquareClient {
             .build()
             .expect("failed to build reqwest client");
 
-        let mut configuration = Configuration::new();
-        configuration.base_path = env.base_url().to_string();
-        configuration.oauth_access_token = Some(access_token.to_string());
-        configuration.user_agent = Some(format!("autogen-squareup/{}", env!("CARGO_PKG_VERSION")));
-        configuration.client = http_client;
-        Self { configuration }
-    }
+        let mut middleware_builder = reqwest_middleware::ClientBuilder::new(http_client);
+        for middleware in self.middleware {
+            middleware_builder = middleware_builder.with_arc(middleware);
+        }
 
-    /// Access the underlying configuration for use with generated API functions.
-    pub fn config(&self) -> &Configuration {
-        &self.configuration
+        let mut configuration = Configuration::new();
+        configuration.base_path = self.environment.base_url().to_string();
+        configuration.oauth_access_token = Some(self.access_token);
+        configuration.user_agent = Some(format!("autogen-squareup/{}", env!("CARGO_PKG_VERSION")));
+        configuration.client = middleware_builder.build();
+        SquareClient { configuration }
     }
 }

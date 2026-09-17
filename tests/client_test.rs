@@ -32,3 +32,17 @@ fn test_with_env_sandbox() {
     let client = SquareClient::with_env("tok", Environment::Sandbox);
     assert_eq!(client.config().base_path, "https://connect.squareupsandbox.com");
 }
+
+#[test]
+fn test_builder_default_environment_is_production() {
+    let client = SquareClient::builder("tok").build();
+    assert_eq!(client.config().base_path, "https://connect.squareup.com");
+}
+
+#[test]
+fn test_builder_sandbox_environment() {
+    let client = SquareClient::builder("tok")
+        .environment(Environment::Sandbox)
+        .build();
+    assert_eq!(client.config().base_path, "https://connect.squareupsandbox.com");
+}
